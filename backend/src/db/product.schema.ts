@@ -1,0 +1,121 @@
+//NOTE: Create a separate schema for discount seasons
+
+import { sql } from "drizzle-orm";
+import { integer, pgTable, varchar, decimal, timestamp, smallint, check, text, pgEnum } from "drizzle-orm/pg-core";
+
+export const productCreativeCommonsEnum = pgEnum("creative_commons", ["BY", "BY-SA", "BY-ND"]);
+//"BY-NC", "BY-NC-SA", "BY-NC-ND" creative commons licences are not allowed, as they are for non-commercial use only
+
+const timestamps = {
+    updated_at: timestamp(),
+    created_at: timestamp().defaultNow().notNull(),
+};
+
+export const productsMaterialsTable = pgTable(
+    "product_materials", 
+    {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    name: varchar({ length: 255 }).unique().notNull(),
+    color: varchar({ length: 255 }).notNull(),
+    description: text(),
+    ...timestamps
+    }
+);
+
+export const productCategory = pgTable(
+    "product_category",
+    {
+        id: integer().primaryKey().generatedAlwaysAsIdentity(),
+        name: varchar({ length: 255 }).unique().notNull(),
+        ...timestamps
+    }
+)
+
+//Table for all unique products
+export const productsListTable = pgTable(
+    "products",
+    {
+        id: integer().primaryKey().generatedAlwaysAsIdentity(),
+        stripe_product_id: varchar({ length: 255 }).unique().notNull(),
+        name: varchar({ length: 255 }).unique().notNull(),
+        price: decimal({ precision: 6, scale: 2 }).notNull(),
+        size_ratio_x: smallint().notNull(),
+        size_ratio_y: smallint().notNull(),
+        size_ratio_z: smallint().notNull(),
+        category: integer("category_id").references(() => productCategory.id).notNull(),
+        description: text(),
+        creativecommons_url: productCreativeCommonsEnum().notNull(),
+        
+        ...timestamps
+    },
+    (table) => [
+        check("price_greater_than_zero", sql`${table.price} > 0`),
+    ],
+);
+
+//Table for product images, many images for one product
+export const productImagesTable = pgTable(
+    "product_images", 
+    {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    name: varchar({ length: 255 }).unique().notNull(),
+    product_id: integer("product_id").references(() => productsListTable.id).notNull(),
+    image_url: varchar({ length: 255 }).notNull(), //Image url is on an external service
+    index: smallint().notNull(),
+    ...timestamps
+    }
+);
+
+//Table for 3D models used in preview, only one model per product
+export const productModelsTable = pgTable(
+    "product_models", 
+    {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    name: varchar({ length: 255 }).unique().notNull(),
+    product_id: integer("product_id").references(() => productsListTable.id).notNull(),
+    model_url: varchar({ length: 255 }).notNull(), //Model url is on an external service
+    ...timestamps
+    }
+);
+
+//Table for product variants and their prices, for multiple variants of the same product
+export const productVariantsTable = pgTable(
+    "product_variants", 
+    {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    product_id: integer("product_id").references(() => productsListTable.id).notNull(),
+    material_id: integer("material_id").references(() => productsMaterialsTable.id).notNull(),
+    upper_size_ratio_cm: smallint().notNull(), //The size of the biggest side of the product in centimeters
+    weight_grams: smallint().notNull(), //Weight in grams
+    price: decimal({ precision: 6, scale: 2 }).notNull(),
+    ...timestamps
+    },
+    (table) => [
+        check("price_greater_than_zero", sql`${table.price} > 0`),
+    ],
+)
+
+//Table for product inventory, also acts as a log of changes since product creation
+export const productsInventoryTable = pgTable(
+    "product_inventory", 
+    {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    variant_id: integer("variant_id").references(() => productVariantsTable.id).notNull(),
+    sold_price: decimal({ precision: 6, scale: 2 }), //The price at which the product was sold, in order to account for discounts and price changes, null if not sold
+    discount: smallint().notNull(), //Discount in percent
+    ...timestamps,
+    deleted_at: timestamp(), //Soft delete
+    }
+);
+
+export const productsDiscountTable = pgTable(
+    "product_discounts", 
+    {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    product_id: integer("product_id").references(() => productsListTable.id).notNull(),
+    discount: smallint().notNull(), //Discount in percent
+    //season_id: integer("season_id").references(() => seasonsTable.id).notNull(),
+    ...timestamps,
+    deleted_at: timestamp(), //Soft delete
+    }
+)
