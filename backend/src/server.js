@@ -5,6 +5,7 @@ import helmet from "helmet";
 import dotenv from "dotenv";
 
 import productRouter from "./routers/products.route.js";
+import materialRouter from "./routers/materials.route.js";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 
 
 app.use("/api/products", productRouter);
+app.use("/api/materials", materialRouter);
 
 
 app.listen(PORT, () => {

@@ -1,7 +1,8 @@
 //NOTE: Create a separate schema for discount seasons
 
 import { sql } from "drizzle-orm";
-import { integer, pgTable, boolean, varchar, decimal, timestamp, smallint, check, text, pgEnum } from "drizzle-orm/pg-core";
+import { integer, pgTable, boolean, varchar, decimal, timestamp, smallint, check, text, pgEnum, unique } from "drizzle-orm/pg-core";
+import { materialsTable } from "./materials.schema.ts";
 
 export const productCreativeCommonsEnum = pgEnum("creative_commons", ["BY", "BY-SA", "BY-ND"]);
 //"BY-NC", "BY-NC-SA", "BY-NC-ND" creative commons licences are not allowed, as they are for non-commercial use only
@@ -13,23 +14,10 @@ const timestamps = {
 
 //----------------------------------Stand Alone Tables----------------------------------//
 
-//Table for the different materials and colors of products
-export const materialsTable = pgTable(
-    "materials", 
-    {
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    name: varchar({ length: 255 }).unique().notNull(),
-    color: varchar({ length: 255 }).notNull(),
-    supplier: varchar({ length: 255 }).notNull(),
-    cost_kg: decimal({ precision: 6, scale: 2 }).notNull(),
-    description: text(),
-    ...timestamps
-    }
-);
 
 //Table for the different categories of products, to facilitate search 
-export const categoryTable = pgTable(
-    "categories",
+export const productTagsTable = pgTable(
+    "product_tags",
     {
         id: integer().primaryKey().generatedAlwaysAsIdentity(),
         name: varchar({ length: 255 }).unique().notNull(),
@@ -57,11 +45,11 @@ export const productsListTable = pgTable(
         id: integer().primaryKey().generatedAlwaysAsIdentity(),
         stripe_product_id: varchar({ length: 255 }).unique().notNull(),
         name: varchar({ length: 255 }).unique().notNull(),
+        is_published: boolean().notNull(),
         size_ratio_xyz: varchar({ length: 255 }).notNull(),
         description: text(),
         author_source: varchar({ length: 255 }).notNull(),
         creativecommons_url: productCreativeCommonsEnum().notNull(),
-        
         ...timestamps
     }
 );
@@ -75,7 +63,7 @@ export const productImagesTable = pgTable(
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     name: varchar({ length: 255 }).unique().notNull(),
     product_id: integer("product_id").references(() => productsListTable.id).notNull(),
-    image_url: varchar({ length: 255 }).notNull(), //Image url is on an external service
+    image_url: varchar({ length: 255 }).unique().notNull(), //Image url is on an external service
     index: smallint().notNull(),
     ...timestamps
     }
@@ -88,9 +76,12 @@ export const productModelsTable = pgTable(
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     name: varchar({ length: 255 }).unique().notNull(),
     product_id: integer("product_id").references(() => productsListTable.id).notNull(),
-    model_url: varchar({ length: 255 }).notNull(), //Model url is on an external service
+    model_url: varchar({ length: 255 }).unique().notNull(), //Model url is on an external service
     ...timestamps
-    }
+    },
+    (table) => [
+        unique().on(table.product_id, table.model_url), //Only one model per product
+    ]
 );
 
 //Table for product variants and their prices, for multiple variants of the same product
@@ -100,12 +91,19 @@ export const productVariantsTable = pgTable(
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     product_id: integer("product_id").references(() => productsListTable.id).notNull(),
     material_id: integer("material_id").references(() => materialsTable.id).notNull(),
+    is_published: boolean().notNull(),
+    is_price_manual: boolean().notNull(), //Determines if the price is manually set or automatically calculated
+    price: decimal({ precision: 6, scale: 2 }),
     upper_size_ratio_cm: smallint().notNull(), //The size of the biggest side of the product in centimeters, used to calculate the size of the product in conjunction with the size_ratio_xyz
     weight_grams: smallint().notNull(), //Weight in grams
-    quality_micron: smallint().notNull(), //Quality in microns
+    quality_micron: smallint().notNull(), //Quality in micrometers
     avg_production_time_mint: smallint().notNull(), //Average production time in minutes
     ...timestamps
-    }
+    },
+    (table) => [
+        unique().on(table.product_id, table.material_id, table.quality_micron), //Only one variant for each product, material and quality combination
+        check("valid_price", sql`${table.price} > 0 AND ${table.price} IS NOT NULL`),
+    ],
 )
 
 //Table for product inventory, also acts as a log of changes since product creation
@@ -132,5 +130,16 @@ export const productsDiscountTable = pgTable(
     season_id: integer("season_id").references(() => seasonsTable.id).notNull(),
     ...timestamps,
     deleted_at: timestamp(), //Soft delete
+    }
+)
+
+//Table for relationship between product tags and products
+export const productsTagsTable = pgTable(
+    "product_tags", 
+    {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    product_id: integer("product_id").references(() => productsListTable.id).notNull(),
+    tag_id: integer("tag_id").references(() => productTagsTable.id).notNull(),
+    ...timestamps
     }
 )

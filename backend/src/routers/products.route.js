@@ -10,5 +10,12 @@ router.post("/", products.createProduct);
 router.put("/:id", products.updateProduct);
 router.delete("/:id", products.deleteProduct);
 
+router.post("/variants/:id", products.createVariantOfProduct);
+router.put("/variants/:id", products.updateVariantOfProduct);
+router.delete("/variants/:id", products.deleteVariantOfProduct);
+
+router.post("/tags/", products.createProductTag);
+router.put("/tags/:id", products.updateProductTag);
+router.delete("/tags/:id", products.deleteProductTag);
 
 export default router;
