@@ -8,7 +8,7 @@ const Navbar = () => {
     return (
         <>
             <div className="has-[#open-menu:hover,#open-menu:focus]:[&_#menu]:block">
-                <header className='bg-base-100 fixed top-0 left-0 w-full z-50'>
+                <header className='bg-base-100 absolute top-0 left-0 w-full z-50'>
                     <nav className="navbar bg-base-100 pb-0 border-b-primary border-b-2">
                         <div className="container mx-auto">
                             <Link to="" >
@@ -30,68 +30,112 @@ const Navbar = () => {
                     </nav>
                 </header>
 
-                <div id="menu" className='fixed hidden hover:block w-full bg-base-200 px-4' >
-                    <ul className="menu md:menu-horizontal w-full lg:min-w-max mt-15">
+                <div id="menu" className='absolute hidden hover:block w-full bg-base-200 mt-16 px-4 z-999' >
+                    <ul className="menu md:menu-horizontal w-full lg:min-w-max justify-around px-8">
                         <li>
-                            <a className="text-lg">Products</a>
+                            <Link to="store" className={location.pathname.slice(0, 6) === "/store" ? "text-primary text-lg" : "text-lg"}>
+                                Products
+                            </Link>
                             <ul>
                                 <li>
-                                    <Link to="store" className={location.pathname === "/store" ? "text-info" : ""}>
+                                    <Link to="store/prints" className={location.pathname === "/store/prints" ? "text-info" : ""}>
                                         Prints Library
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="store" className={location.pathname === "/store" ? "text-info" : ""}>
+                                    <Link to="store/hardware" className={location.pathname === "/store/hardware" ? "text-info" : ""}>
                                         Hardware
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="store" className={location.pathname === "/store" ? "text-info" : ""}>
+                                    <Link to="store/materials" className={location.pathname === "/store/materials" ? "text-info" : ""}>
                                         Filaments & Materials
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="store" className={location.pathname === "/store" ? "text-info" : ""}>
+                                    <Link to="store/accessories" className={location.pathname === "/store/accessories" ? "text-info" : ""}>
                                         Accessories
                                     </Link>
                                 </li>
                             </ul>
                         </li>
                         <li>
-                            <Link to="services" className={location.pathname === "/services" ? "text-info text-lg" : "text-lg"}>
+                            <Link to="services" className={location.pathname.slice(0, 9) === "/services" ? "text-primary text-lg" : "text-lg"}>
                                 Services
                             </Link>
                             <ul>
                                 <li>
-                                    <Link to="services/print_and_prototype" className={location.pathname === "/services/print_and_prototype" ? "text-info" : ""}>
-                                        3D Printing and Prototyping
-                                    </Link></li>
+                                    <Link to="services/scanning-and-digital" className={location.pathname === "/services/scanning-and-digital" ? "text-info" : ""}>
+                                        Scan and Digitalize
+                                    </Link>
+                                </li>
                                 <li>
-                                    <Link to="services/design_and_model" className={location.pathname === "/services/design_and_model" ? "text-info" : ""}>
+                                    <Link to="services/design-and-model" className={location.pathname === "/services/design-and-model" ? "text-info" : ""}>
                                         Design & 3D Modelling
-                                    </Link></li>
+                                    </Link>
+                                </li>
                                 <li>
-                                    <Link to="services/technical_assistance" className={location.pathname === "/services/technical_assistance" ? "text-info" : ""}>
+                                    <Link to="services/print-and-prototype" className={location.pathname === "/services/print-and-prototype" ? "text-info" : ""}>
+                                        3D Printing and Prototyping
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="services/technical-assistance" className={location.pathname === "/services/technical-assistance" ? "text-info" : ""}>
                                         Technical Assistance
-                                    </Link></li>
+                                    </Link>
+                                </li>
                             </ul>
                         </li>
                         <li>
-                            <div className="text-lg">Company</div>
+                            <Link to="company" className={location.pathname.slice(0, 8) === "/company" ? "text-primary text-lg" : "text-lg"}>
+                                Company
+                            </Link>
                             <ul>
                                 <li>
-                                    <Link to="about" className={location.pathname === "/about" ? "text-info" : ""}>
+                                    <Link to="company/about" className={location.pathname === "/company/about" ? "text-info" : ""}>
                                         About Us
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="faq" className={location.pathname === "/faq" ? "text-info" : ""}>
+                                    <Link to="company/contact" className={location.pathname === "/company/contact" ? "text-info" : ""}>
+                                        Contact
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="company/news" className={location.pathname === "/company/news" ? "text-info" : ""}>
+                                        News and Updates
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="company/jobs" className={location.pathname === "/company/jobs" ? "text-info" : ""}>
+                                        Jobs
+                                    </Link>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <Link to="help" className={location.pathname.slice(0, 5) === "/help" ? "text-primary text-lg" : "text-lg"}>
+                                Help
+                            </Link>
+                            <ul>
+                                <li>
+                                    <Link to="help/faq" className={location.pathname === "/help/faq" ? "text-info" : ""}>
                                         FAQ
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="contact" className={location.pathname === "/contact" ? "text-info" : ""}>
-                                        Contact Us
+                                    <Link to="help/terms-and-conditions" className={location.pathname === "/help/terms-and-conditions" ? "text-info" : ""}>
+                                        Terms and Conditions
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="help/privacy-policy   " className={location.pathname === "/help/privacy-policy" ? "text-info" : ""}>
+                                        Privacy Policy
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="help/cookies-policy" className={location.pathname === "/help/cookies-policy" ? "text-info" : ""}>
+                                        Cookies Policy
                                     </Link>
                                 </li>
                             </ul>
@@ -99,7 +143,7 @@ const Navbar = () => {
                     </ul>
                 </div>
             </div>
-            <div className="w-full h-16" />
+            {/* <div className="w-full h-16" />*/}
         </>
     )
 }

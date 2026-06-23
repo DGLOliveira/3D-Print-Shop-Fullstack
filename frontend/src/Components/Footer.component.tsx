@@ -24,31 +24,37 @@ const Footer = () => {
                 <Link to="/store" className="link link-hover">
                     <h6 className="footer-title">Products</h6>
                 </Link>
-                <Link to="/store" className="link link-hover">Prints</Link>
-                <Link to="/store" className="link link-hover">Hardware</Link>
-                <Link to="/store" className="link link-hover">Materials</Link>
-                <Link to="/store" className="link link-hover">Accessories</Link>
+                <Link to="/store/prints" className="link link-hover">Prints</Link>
+                <Link to="/store/hardware" className="link link-hover">Hardware</Link>
+                <Link to="/store/materials" className="link link-hover">Materials</Link>
+                <Link to="/store/accessories" className="link link-hover">Accessories</Link>
             </nav>
             <nav>
                 <Link to="/services" className="link link-hover">
                     <h6 className="footer-title">Services</h6>
                 </Link>
-                <Link to="/services/scanning-and-digitalization" className="link link-hover">Scanning and Digitalization</Link>
-                <Link to="/services/design-and-modelling" className="link link-hover">Design and Modelling</Link>
-                <Link to="/services/3d-printing-and-prototyping" className="link link-hover">3D Printing and Prototyping</Link>
+                <Link to="/services/scanning-and-digital" className="link link-hover">Scanning and Digitalization</Link>
+                <Link to="/services/design-and-model" className="link link-hover">Design and Modelling</Link>
+                <Link to="/services/print-and-prototype" className="link link-hover">3D Printing and Prototyping</Link>
                 <Link to="/services/technical-assistance" className="link link-hover">Technical Assistance</Link>
             </nav>
             <nav>
+                <Link to="/company" className="link link-hover">
                 <h6 className="footer-title">Company</h6>
-                <Link to="/about" className="link link-hover">About us</Link>
-                <Link to="/contact" className="link link-hover">Contact</Link>
-                <Link to="/faq" className="link link-hover">FAQ</Link>
+                </Link>
+                <Link to="/company/about" className="link link-hover">About us</Link>
+                <Link to="/company/contact" className="link link-hover">Contact</Link>
+                <Link to="/company/news" className="link link-hover">News & Updates</Link>
+                <Link to="/company/jobs" className="link link-hover">Jobs</Link>
             </nav>
             <nav>
-                <h6 className="footer-title">Legal</h6>
-                <a className="link link-hover">Terms of use</a>
-                <a className="link link-hover">Privacy policy</a>
-                <a className="link link-hover">Cookie policy</a>
+                <Link to="/help" className="link link-hover">
+                    <h6 className="footer-title">Help</h6>
+                </Link>
+                <Link to="/help/faq" className="link link-hover">FAQ</Link>
+                <Link to="/help/terms-and-conditions" className="link link-hover">Terms & Conditions</Link>
+                <Link to="/help/privacy-policy" className="link link-hover">Privacy policy</Link>
+                <Link to="/help/cookies-policy" className="link link-hover">Cookie policy</Link>
             </nav>
             <nav>
                 <h6 className="footer-title">Social</h6>
