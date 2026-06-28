@@ -7,9 +7,12 @@ import App from './App.tsx'
 import Home from './Pages/Home.page.tsx'
 import NoPage from './Pages/NoPage.page.tsx'
 
-import Cart from './Pages/Cart.page.tsx'
-import CheckOut from './Pages/CheckOut.page.tsx'
-import Admin from './Pages/Admin.page.tsx'
+//Account Pages
+import Account from './Pages/Account Pages/Account.page.tsx'
+import Cart from './Pages/Account Pages/Cart.page.tsx'
+import CheckOut from './Pages/Account Pages/CheckOut.page.tsx'
+import Login from './Pages/Account Pages/Login.page.tsx'
+import Admin from './Pages/Account Pages/Admin.page.tsx'
 
 //Company Pages
 import Company from './Pages/Company Pages/Company.page.tsx'
@@ -51,7 +54,7 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/" element={<App />} >
           <Route index element={<Home />} />
-          <Route path="store" element={<Store />} > 
+          <Route path="store" element={<Store />} >
             <Route path=":id" element={<Product />} />
             <Route path="prints" element={<Prints />} />
             <Route path="hardware" element={<Hardware />} />
@@ -76,9 +79,12 @@ createRoot(document.getElementById('root')!).render(
             <Route path="privacy-policy" element={<Privacy />} />
             <Route path="cookies-policy" element={<Cookies />} />
           </Route>
-          <Route path="cart" element={<Cart />} />
-          <Route path="checkout" element={<CheckOut />} />
-          <Route path="admin" element={<Admin />} />
+          <Route path="account" element={<Account />} >
+            <Route path="login" element={<Login />} />
+            <Route path="admin" element={<Admin />} />
+            <Route path="cart" element={<Cart />} />
+            <Route path="checkout" element={<CheckOut />} />
+          </Route>
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>
