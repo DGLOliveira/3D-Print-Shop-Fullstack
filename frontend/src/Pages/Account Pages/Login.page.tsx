@@ -1,13 +1,32 @@
 import { useState } from 'react'
 import { Eye, EyeOff, User, Loader2, Mail, Lock } from 'lucide-react'
-import { Link } from 'react-router'
+import { useAuthStore } from '../../stores/useAuth.store.tsx'
 
 const Login = () => {
-    const [showPassword, setShowPassword] = useState(false)
-    const [formData, setFormData] = useState({
+
+    const { signup, isSigningUp, login, isLoggingIn } = useAuthStore()
+
+    const [showSignupPassword, setShowSignupPassword] = useState(false)
+    const [signupData, setSignupData] = useState({
+        name: '',
         email: '',
         password: ''
     })
+    const handleSignup = (event: React.SubmitEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        signup(signupData)
+    }
+
+
+    const [showLoginPassword, setShowLoginPassword] = useState(false)
+    const [loginData, setLoginData] = useState({
+        email: '',
+        password: ''
+    })
+    const handleLogin = (event: React.SubmitEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        login(loginData)
+    }
 
 
 
@@ -15,7 +34,7 @@ const Login = () => {
         <div className="min-h-screen flex flex-row gap-6 flex-wrap justify-around  p-6 sm:p-12">
 
 
-            <form /*onSubmit={handleSubmit}*/ className="space-y-4 p-4 grow border-2 border-neutral">
+            <form onSubmit={handleLogin} className="space-y-4 p-4 grow border rounded">
                 <h1 className="text-2xl font-bold mt-2 text-center p-4">Login</h1>
                 <div className="form-control">
                     <label className="label py-1">
@@ -29,9 +48,9 @@ const Login = () => {
                             type="email"
                             className={`input input-bordered w-full pl-10`}
                             placeholder="you@example.com"
-                            value={formData.email}
-                            //disabled={isLoggingIn}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            value={loginData.email}
+                            disabled={isLoggingIn}
+                            onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                         />
                     </div>
                 </div>
@@ -45,19 +64,19 @@ const Login = () => {
                             <Lock className="size-5 text-base-content/40" />
                         </div>
                         <input
-                            type={showPassword ? "text" : "password"}
+                            type={showLoginPassword ? "text" : "password"}
                             className={`input input-bordered w-full pl-10`}
                             placeholder="••••••••"
-                            value={formData.password}
-                            //disabled={isLoggingIn}
-                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            value={loginData.password}
+                            disabled={isLoggingIn}
+                            onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                         />
                         <button
                             type="button"
                             className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                            onClick={() => setShowPassword(!showPassword)}
+                            onClick={() => setShowLoginPassword(!showLoginPassword)}
                         >
-                            {showPassword ? (
+                            {showLoginPassword ? (
                                 <EyeOff className="size-5 text-base-content/40" />
                             ) : (
                                 <Eye className="size-5 text-base-content/40" />
@@ -67,14 +86,14 @@ const Login = () => {
                 </div>
 
                 <button type="submit" className="btn btn-primary w-full" /*disabled={isLoggingIn}*/>
-                    {/*isLoggingIn ? (
-            <>
-              <Loader2 className="size-5 animate-spin" />
-              Loading...
-            </>
-          ) : (
-            "Login"
-          )*/}Login
+                    {isLoggingIn ? (
+                        <>
+                            <Loader2 className="size-5 animate-spin" />
+                            Loading...
+                        </>
+                    ) : (
+                        "Login"
+                    )}
                 </button>
                 <button className="btn btn-info w-full" /*disabled={isLoggingIn}*/>
                     {/*isLoggingIn ? (
@@ -90,7 +109,7 @@ const Login = () => {
 
 
 
-            <form /*onSubmit={handleSubmit}*/ className="space-y-4 p-4 grow border-2 border-neutral">
+            <form onSubmit={handleSignup} className="space-y-4 p-4 grow border">
                 <h1 className="text-2xl font-bold mt-2 text-center p-4">Register</h1>
                 <div className="form-control">
                     <label className="label py-1">
@@ -104,8 +123,8 @@ const Login = () => {
                             type="text"
                             className={`input input-bordered w-full pl-10`}
                             placeholder="John Doe"
-                        //value={formData.fullname}
-                        //onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}
+                            value={signupData.name}
+                            onChange={(e) => setSignupData({ ...signupData, name: e.target.value })}
                         />
                     </div>
                 </div>
@@ -122,8 +141,8 @@ const Login = () => {
                             type="email"
                             className={`input input-bordered w-full pl-10`}
                             placeholder="you@example.com"
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            value={signupData.email}
+                            onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
                         />
                     </div>
                 </div>
@@ -137,18 +156,18 @@ const Login = () => {
                             <Lock className="size-5 text-base-content/40" />
                         </div>
                         <input
-                            type={showPassword ? "text" : "password"}
+                            type={showSignupPassword ? "text" : "password"}
                             className={`input input-bordered w-full pl-10`}
                             placeholder="••••••••"
-                            value={formData.password}
-                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            value={signupData.password}
+                            onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
                         />
                         <button
                             type="button"
                             className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                            onClick={() => setShowPassword(!showPassword)}
+                            onClick={() => setShowSignupPassword(!showSignupPassword)}
                         >
-                            {showPassword ? (
+                            {showSignupPassword ? (
                                 <EyeOff className="size-5 text-base-content/40" />
                             ) : (
                                 <Eye className="size-5 text-base-content/40" />
@@ -158,14 +177,14 @@ const Login = () => {
                 </div>
 
                 <button type="submit" className="btn btn-primary w-full" /*disabled={isSigningUp}*/>
-                    {/*isSigningUp ? (
-            <>
-              <Loader2 className="size-5 animate-spin" />
-              Loading...
-            </>
-          ) : (
-            "Create Account"
-          )*/}Create Account
+                    {isSigningUp ? (
+                        <>
+                            <Loader2 className="size-5 animate-spin" />
+                            Loading...
+                        </>
+                    ) : (
+                        "Create Account"
+                    )}
                 </button>
             </form>
         </div>
