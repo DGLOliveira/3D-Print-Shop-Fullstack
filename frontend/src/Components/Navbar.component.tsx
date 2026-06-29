@@ -1,9 +1,10 @@
-import { Link, useLocation } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 import { ShoppingCart, User } from 'lucide-react'
 
 
 const Navbar = () => {
-    let location = useLocation();
+    const location = useLocation();
+    const navigate = useNavigate()
 
     return (
         <>
@@ -12,7 +13,7 @@ const Navbar = () => {
                     <nav className="navbar bg-base-100 pb-0 border-b-primary border-b-2">
                         <div className="container mx-auto">
                             <Link to="" >
-                                <h1 className="text-3xl font-bold underline decoration-double">Print Shop</h1>
+                                <h1 className="text-3xl font-bold font-serif">Oniros3D</h1>
                             </Link>
                         </div>
                         <div className="container mx-auto flex justify-end align-middle h-full mb-0 gap-3">
@@ -23,14 +24,14 @@ const Navbar = () => {
                                 <ShoppingCart />
                                 <span className="indicator-item indicator-bottom badge badge-sm">0</span>
                             </button>
-                            <button id="open-login" className="btn btn-primary rounded-full p-2" >
+                            <button id="open-login" className="btn btn-primary rounded-full p-2" onClick={() => navigate("/account/login")}>
                                 <User />
                             </button>
                         </div>
                     </nav>
                 </header>
 
-                <div id="menu" className='absolute hidden hover:block w-full bg-base-200 mt-16 px-4 z-999' >
+                <div id="menu" className='absolute hidden hover:block w-full bg-base-200 px-4 z-999' >
                     <ul className="menu md:menu-horizontal w-full lg:min-w-max justify-around px-8">
                         <li>
                             <Link to="store" className={location.pathname.slice(0, 6) === "/store" ? "text-primary text-lg" : "text-lg"}>
