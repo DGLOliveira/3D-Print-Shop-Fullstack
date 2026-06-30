@@ -32,12 +32,8 @@ import Terms from './Pages/Help Pages/Terms.page.tsx'
 
 //Product Pages
 import Store from './Pages/Product Pages/Store.page.tsx'
-import Prints from './Pages/Product Pages/Prints.page.tsx'
-import Hardware from './Pages/Product Pages/Hardware.page.tsx'
-import Materials from './Pages/Product Pages/Materials.page.tsx'
-import Accessories from './Pages/Product Pages/Accessories.page.tsx'
 import Product from './Pages/Product Pages/Product.page.tsx'
-import AddProduct from './Pages/Product Pages/AddPrintProduct.page.tsx'
+import AddProduct from './Pages/Product Pages/AddProduct.page.tsx'
 
 //Service Pages
 import Service from './Pages/Service Pages/Service.page.tsx'
@@ -57,11 +53,7 @@ createRoot(document.getElementById('root')!).render(
           <Route index element={<Home />} />
           <Route path="store" element={<Store />} >
             <Route path=":id" element={<Product />} />
-            <Route path="add-print-product" element={<AddProduct />} />
-            <Route path="prints" element={<Prints />} />
-            <Route path="hardware" element={<Hardware />} />
-            <Route path="materials" element={<Materials />} />
-            <Route path="accessories" element={<Accessories />} />
+            <Route path="add-product" element={<AddProduct />} />
           </Route>
           <Route path="services" element={<Service />} >
             <Route path="scanning-and-digital" element={<ScanningAndDigitalization />} />
