@@ -5,10 +5,10 @@ import StoreList from '../../Components/StoreList.component.tsx'
 import StoreFilter from '../../Components/StoreFilter.component.tsx'
 
 
-import hardware from "../../assets/3D_Hardware_Bundle.png"
-import accessories from "../../assets/3D_Accessories_Bundle.png"
-import materials from "../../assets/3D_Filament_Bundle.png"
-import prints from "../../assets/3D_Prints_Bundle.png"
+import hardware from "../../assets/3D_Hardware_Bundle.webp"
+import accessories from "../../assets/3D_Accessories_Bundle.webp"
+import materials from "../../assets/3D_Filament_Bundle.webp"
+import prints from "../../assets/3D_Prints_Bundle.webp"
 
 // Dictionary of store pages and their images based on category
 const STORE_PAGES: Record<string, string> = {

@@ -1,17 +1,17 @@
 import { Link } from "react-router"
-import hero from "../assets/hero_1_generated.png"
+import hero from "../assets/hero_1_generated.webp"
 import ProductCard from "../Components/ProductCard.component.tsx"
 import FeaturedCarousel from "../Components/FeaturedCarousel.component.tsx"
 
-import digitalization from "../assets/3D_Scan_and_Digitalization.png"
-import modelling from "../assets/3D_Design_and_Modelling.png"
-import printing from "../assets/3D_Printing_and_Prototyping.png"
-import support from "../assets/3D_Technical_Support.png"
+import digitalization from "../assets/3D_Scan_and_Digitalization.webp"
+import modelling from "../assets/3D_Design_and_Modelling.webp"
+import printing from "../assets/3D_Printing_and_Prototyping.webp"
+import support from "../assets/3D_Technical_Support.webp"
 
-import hardware from "../assets/3D_Hardware_Bundle.png"
-import accessories from "../assets/3D_Accessories_Bundle.png"
-import materials from "../assets/3D_Filament_Bundle.png"
-import prints from "../assets/3D_Prints_Bundle.png"
+import hardware from "../assets/3D_Hardware_Bundle.webp"
+import accessories from "../assets/3D_Accessories_Bundle.webp"
+import materials from "../assets/3D_Filament_Bundle.webp"
+import prints from "../assets/3D_Prints_Bundle.webp"
 
 const HomePage = () => {
 
