@@ -40,22 +40,22 @@ const Navbar = () => {
                             </Link>
                             <ul>
                                 <li>
-                                    <Link to="store?category=prints" className={(location.pathname === "/store" && searchParams.get("category")==="Prints") ? "text-info" : ""}>
+                                    <Link to="store?category=Prints" className={(location.pathname === "/store" && searchParams.get("category")==="Prints") ? "text-info" : ""}>
                                         Prints Library
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="store?category=hardware" className={(location.pathname === "/store" && searchParams.get("category")==="Hardware") ? "text-info" : ""}>
+                                    <Link to="store?category=Hardware" className={(location.pathname === "/store" && searchParams.get("category")==="Hardware") ? "text-info" : ""}>
                                         Hardware
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="store?category=materials" className={(location.pathname === "/store" && searchParams.get("category")==="Materials") ? "text-info" : ""}>
+                                    <Link to="store?category=Materials" className={(location.pathname === "/store" && searchParams.get("category")==="Materials") ? "text-info" : ""}>
                                         Filaments & Materials
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="store/accessories" className={(location.pathname === "/store" && searchParams.get("category")==="Accessories") ? "text-info" : ""}>
+                                    <Link to="store?category=Accessories" className={(location.pathname === "/store" && searchParams.get("category")==="Accessories") ? "text-info" : ""}>
                                         Accessories
                                     </Link>
                                 </li>
