@@ -2,7 +2,7 @@ import { Link } from "react-router"
 
 const Footer = () => {
     return (
-        <footer className="footer sm:footer-horizontal bg-neutral text-neutral-content p-10">  <aside>
+        <footer className="footer sm:footer-horizontal bg-black text-neutral-content p-10">  <aside>
             <svg
                 width="50"
                 height="50"
@@ -24,10 +24,10 @@ const Footer = () => {
                 <Link to="/store" className="link link-hover">
                     <h6 className="footer-title">Products</h6>
                 </Link>
-                <Link to="/store/prints" className="link link-hover">Prints</Link>
-                <Link to="/store/hardware" className="link link-hover">Hardware</Link>
-                <Link to="/store/materials" className="link link-hover">Materials</Link>
-                <Link to="/store/accessories" className="link link-hover">Accessories</Link>
+                <Link to="/store?category=Prints" className="link link-hover">Prints</Link>
+                <Link to="/store?category=Hardware" className="link link-hover">Hardware</Link>
+                <Link to="/store?category=Materials" className="link link-hover">Materials</Link>
+                <Link to="/store?category=Accessories" className="link link-hover">Accessories</Link>
             </nav>
             <nav>
                 <Link to="/services" className="link link-hover">

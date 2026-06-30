@@ -1,15 +1,16 @@
-import { Link, useLocation, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router'
 import { ShoppingCart, User } from 'lucide-react'
 
 
 const Navbar = () => {
+    const [searchParams, _setSearchParams] = useSearchParams()
     const location = useLocation();
     const navigate = useNavigate()
 
     return (
         <>
             <div className="has-[#open-menu:hover,#open-menu:focus]:[&_#menu]:block">
-                <header className='bg-base-100 absolute top-0 left-0 w-full z-50'>
+                <header className='bg-base-100 top-0 left-0 w-full z-50'>
                     <nav className="navbar bg-base-100 pb-0 border-b-primary border-b-2">
                         <div className="container mx-auto">
                             <Link to="" >
@@ -39,22 +40,22 @@ const Navbar = () => {
                             </Link>
                             <ul>
                                 <li>
-                                    <Link to="store/prints" className={location.pathname === "/store/prints" ? "text-info" : ""}>
+                                    <Link to="store?category=prints" className={(location.pathname === "/store" && searchParams.get("category")==="Prints") ? "text-info" : ""}>
                                         Prints Library
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="store/hardware" className={location.pathname === "/store/hardware" ? "text-info" : ""}>
+                                    <Link to="store?category=hardware" className={(location.pathname === "/store" && searchParams.get("category")==="Hardware") ? "text-info" : ""}>
                                         Hardware
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="store/materials" className={location.pathname === "/store/materials" ? "text-info" : ""}>
+                                    <Link to="store?category=materials" className={(location.pathname === "/store" && searchParams.get("category")==="Materials") ? "text-info" : ""}>
                                         Filaments & Materials
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="store/accessories" className={location.pathname === "/store/accessories" ? "text-info" : ""}>
+                                    <Link to="store/accessories" className={(location.pathname === "/store" && searchParams.get("category")==="Accessories") ? "text-info" : ""}>
                                         Accessories
                                     </Link>
                                 </li>
@@ -130,7 +131,7 @@ const Navbar = () => {
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="help/privacy-policy   " className={location.pathname === "/help/privacy-policy" ? "text-info" : ""}>
+                                    <Link to="help/privacy-policy" className={location.pathname === "/help/privacy-policy" ? "text-info" : ""}>
                                         Privacy Policy
                                     </Link>
                                 </li>
