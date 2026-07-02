@@ -35,7 +35,7 @@ export const AddBrandModal = () => {
     return (
         <dialog id="add-new-brand" className="modal">
             <div className="modal-box">
-                <h3 className="font-bold text-xl w-full text-center">Add New Brand</h3>
+                <h3 className="font-bold text-xl w-full text-center mb-4">Add New Brand</h3>
                 <div className="flex justify-center gap-4 w-full m-1">
                     <div className="flex flex-col justify-center gap-2">
                         <span>Logo Preview:</span>
