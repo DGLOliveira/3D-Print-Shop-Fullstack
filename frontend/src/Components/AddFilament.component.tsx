@@ -1,7 +1,7 @@
 import { useState, Fragment } from "react"
 import { AddMaterialButton, AddMaterialModal } from "./modals/AddMaterialModal.component.tsx"
 import { AddColorButton, AddColorModal } from "./modals/AddColorModal.component.tsx"
-import { AddMaterialPropertyButton, AddMaterialPropertyModal } from "./modals/AddMaterialProperty.component.tsx"
+import { AddMaterialPropertyButton, AddMaterialPropertyModal } from "./modals/AddMaterialPropertyModal.component.tsx"
 
 
 
