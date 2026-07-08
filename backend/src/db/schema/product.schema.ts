@@ -2,7 +2,7 @@
 
 import { sql } from "drizzle-orm";
 import { integer, pgTable, boolean, varchar, decimal, timestamp, smallint, check, text, pgEnum, unique } from "drizzle-orm/pg-core";
-import { materialsTable } from "./materials.schema.ts";
+import { materialsTable } from "./materials.schema.js";
 
 //Hardcoded enums, no expectation of future changes
 export const productCreativeCommonsEnum = pgEnum("creative_commons", ["BY", "BY-SA", "BY-ND"]);

@@ -1,4 +1,4 @@
-import { router } from "express";
+import { Router } from "express";
 import * as materials from "../controllers/materials.controller.js";
 
 
