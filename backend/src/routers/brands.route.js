@@ -5,7 +5,7 @@ import * as brands from "../controllers/brands.controller.js";
 const router = Router();
 
 router.get("/", brands.getAllBrands);
-router.get("/:id", brands.getSingleBrand);
+router.get("/:id", brands.getSingleBrandById);
 router.post("/", brands.createBrand);
 router.put("/:id", brands.updateBrand);
 router.delete("/:id", brands.deleteBrand);
