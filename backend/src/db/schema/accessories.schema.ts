@@ -1,5 +1,5 @@
 import { integer, pgTable, varchar, timestamp, text, decimal, smallint, unique, boolean } from "drizzle-orm/pg-core";
-import { brandsTable } from "./brands.schema.js";
+import { brandsTable } from "./brands.schema.ts";
 
 const timestamps = {
     updated_at: timestamp(),
@@ -15,17 +15,28 @@ export const accessoriesCategoryTable = pgTable(
     }
 )
 
+export const accessoriesSubCategoryTable = pgTable(
+    "accessories_sub_categories", 
+    {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    name: varchar({ length: 255 }).unique().notNull(),
+    category: integer("category_id").references(() => accessoriesCategoryTable.id).notNull(),
+    ...timestamps
+    }
+)
+
 export const accessoriesTable = pgTable(
     "accessories", 
     {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     name: varchar({ length: 255 }).unique().notNull(),
     brand: integer("brand_id").references(() => brandsTable.id).notNull(),
-    category: integer("category_id").references(() => accessoriesCategoryTable.id).notNull(),
+    subcategory: integer("sub_category_id").references(() => accessoriesSubCategoryTable.id).notNull(),
     price: decimal({ precision: 6, scale: 2 }),
     discount: smallint().notNull(),
     stock: smallint().notNull(),
     description: text(),
+    publish: boolean().notNull(),
     ...timestamps
     }
 );

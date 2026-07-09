@@ -1,11 +1,8 @@
-/*
-  const results = await cloudinary.uploader.upload('./images/my_image.jpg');
-  console.log(results);
-  */
 
-import { db } from "../lib/db.js";
-import cloudinary from "../lib/cloudinary.js";
-import { accessoriesTable, accessoriesImagesTable, accessoriesCategoryTable } from "../db/schema/accessories.schema.js";
+import { db } from "../db/index.ts";
+import cloudinary from "../lib/cloudinary.lib.ts";
+import { accessoriesTable, accessoriesImagesTable, accessoriesCategoryTable } from "../db/schema/accessories.schema.ts";
+import { eq } from "drizzle-orm";
 
 
 /* Accessories Base */
@@ -16,7 +13,7 @@ export const getAllAccessories = async (req, res) => {
         const result = await db.select().from(accessoriesTable);
         return res.status(200).json({ success: true, data: result });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
@@ -40,16 +37,16 @@ export const getSingleAccessoryById = async (req, res) => {
 //this is not the most efficient way to do it, but it is the most secure, and the tradeoff is ideal since we want to provide feedback to the employee, and the process wont be done regularly, so it wont have a significant impact
 
 export const createAccessory = async (req, res) => {
-    const { name, description, categoryId, brandId, price, discount, stock } = req.body;
+    const { name, description, subcategoryId, brandId, price, discount, stock } = req.body;
     const newAccessory = {}
     //Check if all required fields are present
-    if (!name || !description || !categoryId || !brandId || !price || !discount || !stock || !images) {
+    if (!name || !description || !subcategoryId || !brandId || !price || !discount || !stock || !images) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
     //TODO validate data
     newAccessory.name = name;
     newAccessory.description = description;
-    newAccessory.categoryId = categoryId;
+    newAccessory.subcategoryId = subcategoryId;
     newAccessory.brandId = brandId;
     newAccessory.price = price;
     newAccessory.discount = discount;
@@ -65,9 +62,9 @@ export const createAccessory = async (req, res) => {
 
 export const updateAccessory = async (req, res) => {
     const { id } = req.params;
-    const { name, description, categoryId, brandId, price, discount, stock } = req.body;
+    const { name, description, subcategoryId, brandId, price, discount, stock } = req.body;
     try {
-        const result = await db.update(accessoriesTable).set({ name, description, categoryId, brandId, price, discount, stock }).where(eq(accessoriesTable.id, id)).returning();
+        const result = await db.update(accessoriesTable).set({ name, description, subcategoryId, brandId, price, discount, stock }).where(eq(accessoriesTable.id, id)).returning();
         return res.status(200).json({ success: true, data: result });
     } catch (error) {
         console.error(error);
@@ -127,6 +124,39 @@ export const deleteAccessoryCategory = async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
+
+export const getAllAccessoriesSubCategories = async (req, res) => {
+    try {
+        const result = await db.select().from(accessoriesSubcategoryTable);
+        return res.status(200).json({ success: true, data: result });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+}
+
+export const createSubAccessoryCategory = async (req, res) => {
+    const { name, categoryId } = req.body;
+    try {
+        const result = await db.insert(accessoriesSubcategoryTable).values({ name, categoryId }).returning();
+        return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+}
+
+
+export const deleteSubAccessoryCategory = async (req, res) => {
+    const { id } = req.body;
+    try {
+        const result = await db.delete(accessoriesSubcategoryTable).where(eq(accessoriesSubcategoryTable.id, id)).returning();
+        return res.status(204).json({ success: true, data: result });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+}
 
 export const getAllAccessoryImagesByAccessoryId = async (req, res) => {
     const { id } = req.params;

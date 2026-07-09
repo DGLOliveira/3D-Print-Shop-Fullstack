@@ -5,16 +5,23 @@ import * as accessories from "../controllers/accessories.controller.js";
 
 const router = Router();
 
-router.get("/accessories", accessories.getAllAccessories);
-router.get("/accessories/:id", accessories.getSingleAccessoryById);
-router.post("/accessories", accessories.createAccessory);
-router.put("/accessories/:id", accessories.updateAccessory);
-router.delete("/accessories/:id", accessories.deleteAccessory);
+router.get("/accessories/items", accessories.getAllAccessories);
+router.get("/accessories/items/:id", accessories.getSingleAccessoryById);
+router.post("/accessories/items", accessories.createAccessory);
+router.put("/accessories/items/:id", accessories.updateAccessory);
+router.delete("/accessories/items/:id", accessories.deleteAccessory);
 
-router.get("/accessories/images/:id", accessories.getAccessoryImagesById);
-router.post("/accessories/images/:id", accessories.createAccessoryImage);
-router.put("/accessories/images/:id", accessories.updateAccessoryImage);
+router.get("/accessories/images/:id", accessories.getAllAccessoryImagesByAccessoryId);
+router.post("/accessories/images/:id", accessories.uploadAccessoryImage);
 router.delete("/accessories/images/:id", accessories.deleteAccessoryImage);
+
+router.get("/accessories/categories", accessories.getAllAccessoriesCategories);
+router.post("/accessories/categories", accessories.createAccessoryCategory);
+router.delete("/accessories/categories/:id", accessories.deleteAccessoryCategory);
+
+router.get("/accessories/subcategories", accessories.getAllAccessoriesSubCategories);
+router.post("/accessories/subcategories", accessories.createSubAccessoryCategory);
+router.delete("/accessories/subcategories/:id", accessories.deleteSubAccessoryCategory);
 
 
 /*  This will all change
