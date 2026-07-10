@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import MDEditor from '@uiw/react-md-editor';
 import AddImages from '../../Components/AddImages.component.tsx'
-import { useBrandsStore } from '../../stores/useProduct.store.tsx'
+import { useBrandsStore } from '../../stores/useBrands.store.tsx'
+import { AddBrandModal, AddBrandButton, EditBrandButton, EditBrandModal } from '../../Components/modals/BrandModal.component.tsx'
 import { AddFilamentForm, AddFilamentVariant } from '../../Components/AddFilament.component.tsx'
-import { AddBrandModal, AddBrandButton } from '../../Components/modals/AddBrandModal.component.tsx'
 import { AddMaterialModal } from '../../Components/modals/AddMaterialModal.component.tsx'
 import { AddColorModal } from '../../Components/modals/AddColorModal.component.tsx'
 import { AddMaterialPropertyModal } from '../../Components/modals/AddMaterialPropertyModal.component.tsx'
@@ -29,7 +29,7 @@ const AddProduct = () => {
     const [publish, setPublish] = useState(false);
     const [description, setDescription] = useState("");
     const [materialCategory, setMaterialCategory] = useState("")
-    const [brand, setBrand] = useState("")
+    const [brandId, setBrandId]: [number, React.Dispatch<React.SetStateAction<number>>] = useState(-1)
 
     useEffect(() => {
         brandStore.fetchBrands()
@@ -71,6 +71,7 @@ const AddProduct = () => {
     return (
         <>
             <AddBrandModal />
+            <EditBrandModal brandId={brandId} />
             <AddMaterialModal />
             <AddColorModal />
             <AddMaterialPropertyModal />
@@ -92,13 +93,16 @@ const AddProduct = () => {
                     <div className="grid grid-cols-3 gap-4 w-160 min-h-0 ">
                         {/* Category */}
                         <label htmlFor="add-brand">Brand</label>
-                        <select id="add-brand" name="brand" className="select select-bordered w-full max-w-xs text-center" value={brand} onChange={(e) => setBrand(e.target.value)}>
-                            <option disabled selected value="">Brand</option>
+                        <select id="add-brand" name="brand" className="select select-bordered w-full max-w-xs text-center" value={brandId} onChange={(e) => setBrandId(Number(e.target.value))}>
+                            <option disabled selected value={-1}>Brand</option>
                             {brandStore.brands.map((brand, index) =>
                                 <option key={index} value={brand.id}>{brand.name}</option>
                             )}
                         </select>
-                        <AddBrandButton />
+                        <span>
+                            <AddBrandButton />
+                            {brandId > 0 && <EditBrandButton />}
+                        </span>
 
                         <label htmlFor="add-category">Category</label>
                         <select id="add-category" name="category" className="select select-bordered w-full max-w-xs text-center" value={category} onChange={(e) => setCategory(e.target.value)}>

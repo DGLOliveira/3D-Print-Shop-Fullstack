@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router'
+import {Toaster} from 'react-hot-toast'
 import './index.css'
 
 import App from './App.tsx'
@@ -47,6 +48,7 @@ import ScanningAndDigitalization from './Pages/Service Pages/ScanningAndDigitali
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <Toaster />
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} >

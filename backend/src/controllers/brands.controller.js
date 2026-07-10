@@ -80,6 +80,15 @@ export const updateBrand = async (req, res) => {
         updatedBrand.name = name;
     }
     if(website) {
+        updatedBrand.website = website;
+    }
+    if(logo) {
+        updatedBrand.logo = logo;
+    }else{
+        updatedBrand.logo = null;
+    }
+    /*
+    if(website) {
         if(isValidURL(website)) {
             return res.status(400).json({success: false, message: "Invalid website url"});
         }else{
@@ -92,13 +101,15 @@ export const updateBrand = async (req, res) => {
         }else{
             updatedBrand.logo = logo;
         }
-    }
+    }*/
     if(summary) {
         updatedBrand.summary = summary;
+    }else{
+        updatedBrand.summary = null;
     }
     try{
-        await db.update(brandsTable).set(updatedBrand).where(eq(brandsTable.id, req.params.id));
-        return res.status(200).json({success: true, message: "Brand updated successfully"});
+        const result = await db.update(brandsTable).set(updatedBrand).where(eq(brandsTable.id, req.params.id)).returning();
+        return res.status(200).json({success: true, message: "Brand updated successfully", data: result});
     }catch(error) {
         console.error(error);
         return res.status(500).json({success: false, message: "Internal server error"});
