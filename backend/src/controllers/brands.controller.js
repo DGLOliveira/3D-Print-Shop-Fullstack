@@ -43,7 +43,7 @@ export const createBrand = async (req, res) => {
         newBrand.name = name;
         newBrand.website = website;
     }
-
+/* TODO: Fix isValidURL function to account for http:// and https://
         console.log(website)
     //Validate website
     if(isValidURL(website)) {
@@ -56,11 +56,13 @@ export const createBrand = async (req, res) => {
         }else{
             newBrand.logo = logo;
         }
-    }
+    }*/
     //Validate summary
     if(summary !== undefined) {
         newBrand.summary = summary;
     }
+    newBrand.logo = logo;
+    newBrand.summary = summary;
     try{
         const result = await db.insert(brandsTable).values(newBrand).returning();
         console.log(result);

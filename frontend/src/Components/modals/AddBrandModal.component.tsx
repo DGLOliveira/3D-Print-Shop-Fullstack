@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
+import { useBrandsStore, type BrandForm } from '../../stores/useProduct.store.tsx'
+
 
 export const AddBrandButton = () => {
 
@@ -19,8 +21,10 @@ export const AddBrandButton = () => {
 
 export const AddBrandModal = () => {
 
+    const brandStore = useBrandsStore();
+    
     const [logoBackground, setLogoBackground] = useState("light");
-    const [brandForm, setBrandForm] = useState({
+    const [brandForm, setBrandForm] : [BrandForm, React.Dispatch<React.SetStateAction<BrandForm>>] = useState({
         name: "",
         summary: "",
         website: "",
@@ -29,7 +33,7 @@ export const AddBrandModal = () => {
 
     const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
-        /* TODO */
+        brandStore.createBrand(brandForm);
     }
 
     return (
@@ -69,7 +73,7 @@ export const AddBrandModal = () => {
                         <label className="label">
                             <span className="label-text">Summary</span>
                         </label>
-                        <textarea placeholder="Summary" className="input input-bordered" value={brandForm.summary} onChange={(e) => setBrandForm({ ...brandForm, summary: e.target.value })} />
+                        <textarea placeholder="Summary" className="input input-bordered text-wrap" value={brandForm.summary} onChange={(e) => setBrandForm({ ...brandForm, summary: e.target.value })} />
                     </div>
                     <div className="flex justify-center w-full m-1">
                         <button type="submit" className="btn">Submit</button>
