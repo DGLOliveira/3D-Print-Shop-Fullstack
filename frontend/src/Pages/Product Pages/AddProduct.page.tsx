@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react'
 import MDEditor from '@uiw/react-md-editor';
 import AddImages from '../../Components/AddImages.component.tsx'
 import { useBrandsStore } from '../../stores/useBrands.store.tsx'
-import { AddBrandModal, AddBrandButton, EditBrandButton, EditBrandModal } from '../../Components/modals/BrandModal.component.tsx'
+import { BrandModal, BrandModalButtons } from '../../Components/modals/BrandModal.component.tsx'
 import { AddFilamentForm, AddFilamentVariant } from '../../Components/AddFilament.component.tsx'
 import { AddMaterialModal } from '../../Components/modals/AddMaterialModal.component.tsx'
 import { AddColorModal } from '../../Components/modals/AddColorModal.component.tsx'
 import { AddMaterialPropertyModal } from '../../Components/modals/AddMaterialPropertyModal.component.tsx'
 import { AddAccessoryForm } from '../../Components/AddAccessory.component.tsx'
-import { AddAccessoryCategoryModal } from '../../Components/modals/AddAccessoryCategoryModal.component.tsx'
+import { AddAccessoryCategoryModal } from '../../Components/modals/AccessoryCategoryModal.component.tsx'
 import { AddResinForm, AddResinVariant } from '../../Components/AddResin.component.tsx'
 import { AddResinCategoryModal } from '../../Components/modals/AddResinCategoryModal.component.tsx'
 import { AddResinLightSourceModal } from '../../Components/modals/AddResinLightSourceModal.component.tsx'
@@ -30,6 +30,8 @@ const AddProduct = () => {
     const [description, setDescription] = useState("");
     const [materialCategory, setMaterialCategory] = useState("")
     const [brandId, setBrandId]: [number, React.Dispatch<React.SetStateAction<number>>] = useState(-1)
+
+const [modalMode, setModalMode] = useState("add");
 
     useEffect(() => {
         brandStore.fetchBrands()
@@ -70,8 +72,7 @@ const AddProduct = () => {
 
     return (
         <>
-            <AddBrandModal />
-            <EditBrandModal brandId={brandId} />
+            <BrandModal brandId={brandId} modalMode={modalMode} />
             <AddMaterialModal />
             <AddColorModal />
             <AddMaterialPropertyModal />
@@ -100,8 +101,7 @@ const AddProduct = () => {
                             )}
                         </select>
                         <span>
-                            <AddBrandButton />
-                            {brandId > 0 && <EditBrandButton />}
+                            <BrandModalButtons canEdit={brandId !== -1} setModalMode={setModalMode} />
                         </span>
 
                         <label htmlFor="add-category">Category</label>
