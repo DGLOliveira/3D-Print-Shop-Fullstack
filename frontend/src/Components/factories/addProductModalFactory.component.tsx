@@ -8,14 +8,14 @@ export const ButtonFactory = ({ modalId, title, canEdit, setMode }: { modalId: s
     }
 
     return (
-        <>
+        <div>
             <button className="btn btn-ghost w-fit ml-2 p-1" title={"Add New " + title} onClick={() => { openModal(); setMode("add"); }}>
                 <Plus />
             </button>
             <button disabled={!canEdit} className="btn btn-ghost w-fit ml-2 p-1" title={"Edit " + title} onClick={() => { openModal(); setMode("edit"); }}>
                 <PenLine />
             </button>
-        </>
+        </div>
     )
 }
 

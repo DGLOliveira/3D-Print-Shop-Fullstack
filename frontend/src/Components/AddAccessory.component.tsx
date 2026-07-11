@@ -1,35 +1,57 @@
-import { useState } from 'react'
-import { AddAccessoryCategoryButton } from './modals/AddAccessoryCategoryModal.component'
-import { AddAccessorySubCategoryButton } from './modals/AddAccessorySubCategoryModal.component'
+import { useState, useEffect } from 'react'
+import { AccessoryCategoryButtons, AccessoryCategoryModal } from './modals/AccessoryCategoryModal.component'
+import { AddAccessorySubCategoryButton, AddAccessorySubCategoryModal } from './modals/AddAccessorySubCategoryModal.component'
+import { useAccessoriesStore } from '../stores/useAccessories.store.tsx'
 
-export const AddAccessoryForm = () => {
+export const AddAccessoryModals = ({modalMode} : {modalMode: string}) => {
+
+    return (
+        <>
+            <AccessoryCategoryModal modalMode={modalMode} />
+            <AddAccessorySubCategoryModal modalMode={modalMode} />
+        </>
+    )
+}
+
+export const AddAccessoryForm = ({modalMode} : {modalMode: string}) => {
+
+    const accessoryStore = useAccessoriesStore();
+    const selectedCategoryName = accessoryStore.selectedCategoryName
+    const selectedSubcategoryName = accessoryStore.selectedSubcategoryName
 
     const [accessoryCategory, setAccessoryCategory] = useState("")
     const [price, setPrice] = useState(0)
     const [discount, setDiscount] = useState(0)
     const [stock, setStock] = useState(0)
+
+
+    useEffect(()=>{
+        accessoryStore.fetchAccessories()
+        accessoryStore.fetchCategories()
+    },[])
+
+    useEffect(()=>{
+        accessoryStore.selectSubcategory("")
+    },[selectedCategoryName])
+
     return (
         <>
 
             <label htmlFor="add-accessory-category">Accessory Category</label>
-            <select id="accessory-category" name="accessory-category" className="select select-bordered w-full max-w-xs text-center" value={accessoryCategory} onChange={(e) => setAccessoryCategory(e.target.value)}>
-                <option disabled selected>Category</option>
-                <option value=""></option>
-                <option value=""></option>
-                <option value=""></option>
-                <option value=""></option>
+            <select id="accessory-category" name="accessory-category" className="select select-bordered w-full max-w-xs text-center" value={selectedCategoryName} onChange={(e) => accessoryStore.selectCategory(e.target.value)}>
+                <option disabled selected value="">Category</option>
+                {Object.keys(accessoryStore.categories).map((name, index) => 
+                <option key={index} value={name}>{name}</option>
+                )}
             </select>
-            <>
-                <AddAccessoryCategoryButton />
-            </>
+            <AccessoryCategoryButtons canEdit={selectedCategoryName !== ""} setModalMode={setAccessoryCategory} />
             
             <label htmlFor="add-accessory-subcategory">Accessory SubCategory</label>
-            <select id="accessory-subcategory" name="accessory-subcategory" className="select select-bordered w-full max-w-xs text-center" value={accessoryCategory} onChange={(e) => setAccessoryCategory(e.target.value)}>
-                <option disabled selected>SubCategory</option>
-                <option value=""></option>
-                <option value=""></option>
-                <option value=""></option>
-                <option value=""></option>
+            <select id="accessory-subcategory" name="accessory-subcategory" className="select select-bordered w-full max-w-xs text-center" value={selectedSubcategoryName} onChange={(e) => accessoryStore.selectSubcategory(e.target.value)}>
+                <option disabled selected value="">SubCategory</option>
+                {Object.keys(accessoryStore.categories[selectedCategoryName].subcategories).map((name, index) => 
+                <option key={index} value={name}>{name}</option>
+                )}
             </select>
             <>
                 <AddAccessorySubCategoryButton />

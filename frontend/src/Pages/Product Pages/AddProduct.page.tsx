@@ -2,23 +2,23 @@ import { useState, useEffect } from 'react'
 import MDEditor from '@uiw/react-md-editor';
 import AddImages from '../../Components/AddImages.component.tsx'
 import { useBrandsStore } from '../../stores/useBrands.store.tsx'
+import { useAccessoriesStore } from '../../stores/useAccessories.store.tsx'
 import { BrandModal, BrandModalButtons } from '../../Components/modals/BrandModal.component.tsx'
 import { AddFilamentForm, AddFilamentVariant } from '../../Components/AddFilament.component.tsx'
 import { AddMaterialModal } from '../../Components/modals/AddMaterialModal.component.tsx'
 import { AddColorModal } from '../../Components/modals/AddColorModal.component.tsx'
 import { AddMaterialPropertyModal } from '../../Components/modals/AddMaterialPropertyModal.component.tsx'
-import { AddAccessoryForm } from '../../Components/AddAccessory.component.tsx'
-import { AddAccessoryCategoryModal } from '../../Components/modals/AccessoryCategoryModal.component.tsx'
+import { AddAccessoryForm, AddAccessoryModals } from '../../Components/AddAccessory.component.tsx'
 import { AddResinForm, AddResinVariant } from '../../Components/AddResin.component.tsx'
 import { AddResinCategoryModal } from '../../Components/modals/AddResinCategoryModal.component.tsx'
 import { AddResinLightSourceModal } from '../../Components/modals/AddResinLightSourceModal.component.tsx'
-import { AddAccessorySubCategoryModal } from '../../Components/modals/AddAccessorySubCategoryModal.component.tsx'
 
 const MATERIAL_CATEGORY = ["Filament", "Resin"]
 
 const AddProduct = () => {
 
     const brandStore = useBrandsStore()
+    const accessoryStore = useAccessoriesStore()
 
     const [title, setTitle] = useState("");
     const [category, setCategory] = useState("");
@@ -76,8 +76,7 @@ const [modalMode, setModalMode] = useState("add");
             <AddMaterialModal />
             <AddColorModal />
             <AddMaterialPropertyModal />
-            <AddAccessoryCategoryModal />
-            <AddAccessorySubCategoryModal />
+            <AddAccessoryModals modalMode={modalMode} />
             <AddResinCategoryModal />
             <AddResinLightSourceModal />
             <form onSubmit={submitProduct} className="flex flex-col gap-8">
@@ -100,9 +99,8 @@ const [modalMode, setModalMode] = useState("add");
                                 <option key={index} value={brand.id}>{brand.name}</option>
                             )}
                         </select>
-                        <span>
-                            <BrandModalButtons canEdit={brandId !== -1} setModalMode={setModalMode} />
-                        </span>
+                        <BrandModalButtons canEdit={brandId !== -1} setModalMode={setModalMode} />
+                        
 
                         <label htmlFor="add-category">Category</label>
                         <select id="add-category" name="category" className="select select-bordered w-full max-w-xs text-center" value={category} onChange={(e) => setCategory(e.target.value)}>
@@ -135,7 +133,7 @@ const [modalMode, setModalMode] = useState("add");
 
                         {category === "Accessories" &&
                             <>
-                                <AddAccessoryForm />
+                                <AddAccessoryForm setModalMode={setModalMode} />
                             </>
                         }
                         {/* For Hardware, Accessories & Material */}
