@@ -11,7 +11,7 @@ export const AccessoryCategoryButtons = ({ canAdd, canEdit, setModalMode }: {can
 
 export const AccessoryCategoryModal = ({ modalMode }: { modalMode: string }) => {
 
-    const accessoryStore = useAccessoriesStore();
+    const {isUpdatingCat, selectedCategoryName, createCategory, updateCategory, deleteCategory} = useAccessoriesStore();
     const [categoryForm, setCategoryForm] : [AccessoryCategoryForm, React.Dispatch<React.SetStateAction<AccessoryCategoryForm>>] = useState({
         name: "",
     });
@@ -31,24 +31,24 @@ export const AccessoryCategoryModal = ({ modalMode }: { modalMode: string }) => 
 
     useEffect(()=>{
         if (modalMode === "edit") {
-            setCategoryForm({name: accessoryStore.selectedCategoryName})
+            setCategoryForm({name: selectedCategoryName})
         }else{
             setCategoryForm({name: ""})
         }
-    },[modalMode])
+    },[modalMode, selectedCategoryName, isUpdatingCat])
 
     const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         const dialog = document.getElementById(modalId) as HTMLDialogElement
         if (modalMode === "add") {
-            accessoryStore.createCategory(categoryForm, dialog);
+            createCategory(categoryForm, dialog);
         } else {
-            accessoryStore.updateCategory(categoryForm, dialog);
+            updateCategory(categoryForm, dialog);
         }
     }
 
     const handleDelete = () => {
-        accessoryStore.deleteCategory();
+        deleteCategory();
     }
 
     return (

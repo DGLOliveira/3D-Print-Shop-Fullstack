@@ -59,12 +59,8 @@ export interface AccessoryForm {
 }
 
 interface AccessoriesState {
-    isCreatingCat: boolean;
     isUpdatingCat: boolean;
-    isLoadingCat: boolean;
-    isCreatingAcc: boolean;
     isUpdatingAcc: boolean;
-    isLoadingAcc: boolean;
     categories: AcessoryCategoryObjects;
     accessories: Accessory[];
     selectedAccessoryId: number | null;
@@ -91,18 +87,14 @@ interface AccessoriesState {
 }
 
 
-const CATEGORY_URL = "/accessories/categories";
-const SUBCATEGORY_URL = "/accessories/subcategories";
-const ACCESSORY_URL = "/accessories/items";
+const CATEGORY_URL = "/products/accessories/categories";
+const SUBCATEGORY_URL = "/products/accessories/subcategories";
+const ACCESSORY_URL = "/products/accessories/items";
 
 
 export const useAccessoriesStore = create<AccessoriesState>((set, get) => ({
-    isCreatingCat: false,
     isUpdatingCat: false,
-    isLoadingCat: false,
-    isCreatingAcc: false,
     isUpdatingAcc: false,
-    isLoadingAcc: false,
     categories: {},
     accessories: [],
     selectedAccessoryId: null,
@@ -115,27 +107,32 @@ export const useAccessoriesStore = create<AccessoriesState>((set, get) => ({
 
     fetchCategories: async () => {
         try {
-            set({ isLoadingCat: true })
+            set({ isUpdatingCat: true })
             const res = await axiosInstance.get(CATEGORY_URL)
             set({ categories: res.data.data })
         } catch (error) {
             handleErrorMessage(error, "fetchCategories")
         } finally {
-            set({ isLoadingCat: true })
+            set({ isUpdatingCat: false })
         }
     },
 
     createCategory: async (categoryForm, dialog : HTMLDialogElement) => {
         try {
-            set({ isCreatingCat: true });
+            set({ isUpdatingCat: true });
             const res = await axiosInstance.post(CATEGORY_URL, categoryForm);
-            set((state) => ({ categories: { ...state.categories, [res.data.data.name]: res.data.data.id } }));
+            const newEntry = res.data.data[0]
+            let newCategories = get().categories;
+            newCategories[newEntry.name] = {id: newEntry.id, subcategories: {}}
+            set({ categories: newCategories});
+            set({ selectedCategoryName: newEntry.name });
+            set({ selectedSubCategoryName: "" });
             toast.success("Category created successfully");
             dialog.close();
         } catch (error) {
             handleErrorMessage(error, "createCategory")
         } finally {
-            set({ isCreatingCat: false });
+            set({ isUpdatingCat: false });
         }
     },
 
@@ -144,7 +141,13 @@ export const useAccessoriesStore = create<AccessoriesState>((set, get) => ({
             const id = get().categories[get().selectedCategoryName].id
             set({ isUpdatingCat: true });
             const res = await axiosInstance.put(CATEGORY_URL + "/" + id, categoryForm);
-            set((state) => ({ categories: { ...state.categories, [res.data.data.name]: res.data.data.id } }));
+            const newEntry = res.data.data[0]
+            let newCategories = get().categories;
+            newCategories[newEntry.name] = {id: newEntry.id, subcategories: newCategories[get().selectedCategoryName].subcategories}
+            delete newCategories[get().selectedCategoryName];
+            set({ categories: newCategories});
+            set({ selectedSubCategoryName: "" });
+            set({ selectedCategoryName: newEntry.name });
             toast.success("Category updated successfully");
             dialog.close();
         } catch (error) {
@@ -159,7 +162,11 @@ export const useAccessoriesStore = create<AccessoriesState>((set, get) => ({
             set({ isUpdatingCat: true });
             const id = get().categories[get().selectedCategoryName].id
             await axiosInstance.delete(CATEGORY_URL + "/" + id);
-            set((state) => ({ categories: Object.fromEntries(Object.entries(state.categories).filter(([key]) => state.categories[key].id !== id)) }));
+            let newCategories = get().categories;
+            delete newCategories[get().selectedCategoryName];
+            set({ selectedCategoryName: "" });
+            set({ selectedSubCategoryName: "" });
+            set({ categories: newCategories});
             toast.success("Category deleted successfully");
         } catch (error) {
             handleErrorMessage(error, "deleteCategory")
@@ -170,15 +177,19 @@ export const useAccessoriesStore = create<AccessoriesState>((set, get) => ({
 
     createSubCategory: async (subcategoryForm, dialog : HTMLDialogElement) => {
         try {
-            set({ isCreatingCat: true });
+            set({ isUpdatingCat: true });
             const res = await axiosInstance.post(SUBCATEGORY_URL, subcategoryForm);
-            set((state) => ({ categories: { ...state.categories, [res.data.data.category.name]: res.data.data.category } }));
+            const newEntry = res.data.data[0]
+            let newCategories = get().categories;
+            newCategories[get().selectedCategoryName].subcategories[newEntry.name] = {id: newEntry.id}
+            set({ categories: newCategories});
+            set({ selectedSubCategoryName: newEntry.name });
             toast.success("Subcategory created successfully");
             dialog.close();
         } catch (error) {
             handleErrorMessage(error, "createSubCategory")
         } finally {
-            set({ isCreatingCat: false });
+            set({ isUpdatingCat: false });
         }
     },
 
@@ -187,7 +198,12 @@ export const useAccessoriesStore = create<AccessoriesState>((set, get) => ({
             set({ isUpdatingCat: true });
             const id = get().categories[get().selectedCategoryName].subcategories[get().selectedSubCategoryName].id
             const res = await axiosInstance.put(SUBCATEGORY_URL + "/" + id, subcategoryForm);
-            set((state) => ({ categories: { ...state.categories, [res.data.data.category.name]: res.data.data.category } }));
+            const newEntry = res.data.data[0]
+            let newCategories = get().categories;
+            delete newCategories[get().selectedCategoryName].subcategories[get().selectedSubCategoryName];
+            newCategories[get().selectedCategoryName].subcategories[newEntry.name] = {id: newEntry.id}
+            set({ categories: newCategories});
+            set({ selectedSubCategoryName: newEntry.name });
             toast.success("Subcategory updated successfully");
             dialog.close();
         } catch (error) {
@@ -202,7 +218,10 @@ export const useAccessoriesStore = create<AccessoriesState>((set, get) => ({
             set({ isUpdatingCat: true });
             const id = get().categories[get().selectedCategoryName].subcategories[get().selectedSubCategoryName].id
             await axiosInstance.delete(SUBCATEGORY_URL + "/" + id);
-            set((state) => ({ categories: Object.fromEntries(Object.entries(state.categories).filter(([key]) => state.categories[key].id !== id)) }));
+            let newCategories = get().categories;
+            delete newCategories[get().selectedCategoryName].subcategories[get().selectedSubCategoryName];
+            set({ categories: newCategories});
+            set({ selectedSubCategoryName: "" });
             toast.success("Subcategory deleted successfully");
         } catch (error) {
             handleErrorMessage(error, "deleteSubCategory")
@@ -214,26 +233,26 @@ export const useAccessoriesStore = create<AccessoriesState>((set, get) => ({
 
     fetchAccessories: async () => {
         try {
-            set({ isLoadingAcc: true });
+            set({ isUpdatingAcc: true });
             const res = await axiosInstance.get(ACCESSORY_URL);
             set({ accessories: res.data.data });
         } catch (error) {
             handleErrorMessage(error, "fetchAccessories")
         } finally {
-            set({ isLoadingAcc: false });
+            set({ isUpdatingAcc: false });
         }
     },
 
     createAccessory: async (accessoryForm) => {
         try {
-            set({ isCreatingAcc: true });
+            set({ isUpdatingAcc: true });
             const res = await axiosInstance.post(ACCESSORY_URL, accessoryForm);
             set((state) => ({ accessories: [...state.accessories, res.data.data] }));
             toast.success("Accessory created successfully");
         } catch (error) {
             handleErrorMessage(error, "createAccessory")
         } finally {
-            set({ isCreatingAcc: false });
+            set({ isUpdatingAcc: false });
         }
     },
 

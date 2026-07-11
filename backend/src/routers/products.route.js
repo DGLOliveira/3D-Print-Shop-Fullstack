@@ -17,10 +17,12 @@ router.delete("/accessories/images/:id", accessories.deleteAccessoryImage);
 
 router.get("/accessories/categories", accessories.getAllAccessoriesCategories);
 router.post("/accessories/categories", accessories.createAccessoryCategory);
+router.put("/accessories/categories/:id", accessories.updateAccessoryCategory);
 router.delete("/accessories/categories/:id", accessories.deleteAccessoryCategory);
 
-router.get("/accessories/subcategories", accessories.getAllAccessoriesSubCategories);
+
 router.post("/accessories/subcategories", accessories.createSubAccessoryCategory);
+router.put("/accessories/subcategories/:id", accessories.updateSubAccessoryCategory);
 router.delete("/accessories/subcategories/:id", accessories.deleteSubAccessoryCategory);
 
 

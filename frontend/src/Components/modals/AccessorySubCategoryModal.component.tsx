@@ -4,19 +4,19 @@ import { useAccessoriesStore, type AcessorySubCategoryForm } from '../../stores/
 
 const modalId = "accessory-subcategory-modal";
 
-export const AccessorySubCategoryButtons = ({canAdd, canEdit, setModalMode }: {canAdd : boolean, canEdit: boolean, setModalMode: React.Dispatch<React.SetStateAction<string>> }) => {
+export const AccessorySubCategoryButtons = ({ canAdd, canEdit, setModalMode }: { canAdd: boolean, canEdit: boolean, setModalMode: React.Dispatch<React.SetStateAction<string>> }) => {
     return <ButtonFactory modalId={modalId} title="Brand" canAdd={canAdd} canEdit={canEdit} setMode={setModalMode} />
 }
 
 export const AccessorySubCategoryModal = ({ modalMode }: { modalMode: string }) => {
 
-    const accessoryStore = useAccessoriesStore();
+    const { isUpdatingCat, selectedSubCategoryName, selectedCategoryName, categories, createSubCategory, updateSubCategory, deleteSubCategory } = useAccessoriesStore();
     const [subcategoryForm, setSubcategoryForm]: [AcessorySubCategoryForm, React.Dispatch<React.SetStateAction<AcessorySubCategoryForm>>] = useState({
         name: "",
         categoryId: -1
     });
 
-    const title = modalMode === "add" ? "Add New Category" : "Edit Category";
+    const title = modalMode === "add" ? "Add New SubCategory" : "Edit SubCategory";
 
     const formTypes = [
         {
@@ -29,29 +29,33 @@ export const AccessorySubCategoryModal = ({ modalMode }: { modalMode: string }) 
 
 
     useEffect(() => {
-        if (accessoryStore.selectedSubCategoryName !== "") {
+        if (selectedSubCategoryName !== "") {
             if (modalMode === "edit") {
-                setSubcategoryForm({ categoryId: accessoryStore.categories[accessoryStore.selectedCategoryName].id, name: accessoryStore.selectedSubCategoryName })
+                setSubcategoryForm({ categoryId: categories[selectedCategoryName].id, name: selectedSubCategoryName })
             } else {
-                setSubcategoryForm({ categoryId: accessoryStore.categories[accessoryStore.selectedCategoryName].id, name: "" })
+                setSubcategoryForm({ categoryId: categories[selectedCategoryName].id, name: "" })
             }
         } else {
-            setSubcategoryForm({ categoryId: -1, name: "" })
+            if (selectedCategoryName === "") {
+                setSubcategoryForm({ categoryId: -1, name: "" })
+            } else {
+                setSubcategoryForm({ categoryId: categories[selectedCategoryName].id, name: "" })
+            }
         }
-    }, [modalMode, accessoryStore.selectedCategoryName])
+    }, [modalMode, selectedCategoryName, isUpdatingCat])
 
     const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         const dialog = document.getElementById(modalId) as HTMLDialogElement
         if (modalMode === "add") {
-            accessoryStore.createSubCategory(subcategoryForm, dialog);
+            createSubCategory(subcategoryForm, dialog);
         } else {
-            accessoryStore.updateSubCategory(subcategoryForm, dialog);
+            updateSubCategory(subcategoryForm, dialog);
         }
     }
 
     const handleDelete = () => {
-        accessoryStore.deleteSubCategory();
+        deleteSubCategory();
     }
 
     return (

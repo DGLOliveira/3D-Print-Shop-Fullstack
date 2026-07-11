@@ -1,7 +1,7 @@
 
 import { db } from "../db/index.ts";
 import cloudinary from "../lib/cloudinary.lib.ts";
-import { accessoriesTable, accessoriesImagesTable, accessoriesCategoryTable } from "../db/schema/accessories.schema.ts";
+import { accessoriesTable, accessoriesImagesTable, accessoriesCategoryTable, accessoriesSubCategoryTable } from "../db/schema/accessories.schema.ts";
 import { eq } from "drizzle-orm";
 
 
@@ -92,11 +92,34 @@ export const deleteAccessory = async (req, res) => {
     }
 };
 
+function formatAccessoriesCategories(result) {
+    const formattedResult = {};
+    result.forEach((category) => {
+        if (!formattedResult[category.accessories_categories.name]) {
+            formattedResult[category.accessories_categories.name] = {
+                id: category.accessories_categories.id,
+                subcategories: {},
+            }
+        }
+        if (category.accessories_sub_categories) {
+            formattedResult[category.accessories_categories.name] = {
+                ...formattedResult[category.accessories_categories.name],
+                subcategories: {
+                    ...formattedResult[category.accessories_categories.name].subcategories,
+                    [category.accessories_sub_categories.name]: {
+                        id: category.accessories_sub_categories.id
+                    }
+                }
+            }
+        }
+    })
+    return formattedResult
+}
 
 export const getAllAccessoriesCategories = async (req, res) => {
     try {
-        const result = await db.select().from(accessoriesCategoryTable);
-        return res.status(200).json({ success: true, data: result });
+        const result = await db.select().from(accessoriesCategoryTable).leftJoin(accessoriesSubCategoryTable, eq(accessoriesCategoryTable.id, accessoriesSubCategoryTable.categoryId));
+        return res.status(200).json({ success: true, data: formatAccessoriesCategories(result) });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ success: false, message: "Internal server error" });
@@ -114,8 +137,20 @@ export const createAccessoryCategory = async (req, res) => {
     }
 };
 
+export const updateAccessoryCategory = async (req, res) => {
+    const { id } = req.params;
+    const { name } = req.body;
+    try {
+        const result = await db.update(accessoriesCategoryTable).set({ name }).where(eq(accessoriesCategoryTable.id, id)).returning();
+        return res.status(200).json({ success: true, data: result });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+}
+
 export const deleteAccessoryCategory = async (req, res) => {
-    const { id } = req.body;
+    const { id } = req.params;
     try {
         const result = await db.delete(accessoriesCategoryTable).where(eq(accessoriesCategoryTable.id, id)).returning();
         return res.status(204).json({ success: true, data: result });
@@ -125,20 +160,10 @@ export const deleteAccessoryCategory = async (req, res) => {
     }
 };
 
-export const getAllAccessoriesSubCategories = async (req, res) => {
-    try {
-        const result = await db.select().from(accessoriesSubcategoryTable);
-        return res.status(200).json({ success: true, data: result });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ success: false, message: "Internal server error" });
-    }
-}
-
 export const createSubAccessoryCategory = async (req, res) => {
     const { name, categoryId } = req.body;
     try {
-        const result = await db.insert(accessoriesSubcategoryTable).values({ name, categoryId }).returning();
+        const result = await db.insert(accessoriesSubCategoryTable).values({ name, categoryId }).returning();
         return res.status(201).json({ success: true, data: result });
     } catch (error) {
         console.error(error);
@@ -146,11 +171,22 @@ export const createSubAccessoryCategory = async (req, res) => {
     }
 }
 
+export const updateSubAccessoryCategory = async (req, res) => {
+    const { id } = req.params;
+    const { name } = req.body;
+    try {
+        const result = await db.update(accessoriesSubCategoryTable).set({ name }).where(eq(accessoriesSubCategoryTable.id, id)).returning();
+        return res.status(200).json({ success: true, data: result });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+}
 
 export const deleteSubAccessoryCategory = async (req, res) => {
-    const { id } = req.body;
+    const { id } = req.params;
     try {
-        const result = await db.delete(accessoriesSubcategoryTable).where(eq(accessoriesSubcategoryTable.id, id)).returning();
+        const result = await db.delete(accessoriesSubCategoryTable).where(eq(accessoriesSubCategoryTable.id, id)).returning();
         return res.status(204).json({ success: true, data: result });
     } catch (error) {
         console.error(error);

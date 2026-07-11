@@ -20,7 +20,7 @@ export const accessoriesSubCategoryTable = pgTable(
     {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     name: varchar({ length: 255 }).unique().notNull(),
-    category: integer("category_id").references(() => accessoriesCategoryTable.id).notNull(),
+    categoryId: integer("category_id").references(() => accessoriesCategoryTable.id).notNull(),
     ...timestamps
     }
 )
@@ -30,8 +30,8 @@ export const accessoriesTable = pgTable(
     {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     name: varchar({ length: 255 }).unique().notNull(),
-    brand: integer("brand_id").references(() => brandsTable.id).notNull(),
-    subcategory: integer("sub_category_id").references(() => accessoriesSubCategoryTable.id).notNull(),
+    brandId: integer("brand_id").references(() => brandsTable.id).notNull(),
+    subcategoryId: integer("sub_category_id").references(() => accessoriesSubCategoryTable.id).notNull(),
     price: decimal({ precision: 6, scale: 2 }),
     discount: smallint().notNull(),
     stock: smallint().notNull(),
@@ -46,7 +46,7 @@ export const accessoriesImagesTable = pgTable(
     {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     name: varchar({ length: 255 }).unique().notNull(),
-    accessory_id: integer("accessory_id").references(() => accessoriesTable.id).notNull(),
+    accessoryId: integer("accessory_id").references(() => accessoriesTable.id).notNull(),
     image_url: varchar({ length: 255 }).unique().notNull(), //Image url is on an external service
     index: smallint().notNull(),
     is_thumbnail: boolean().notNull(), //Determines if the image is the preview image used for the store list

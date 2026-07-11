@@ -47,7 +47,7 @@ export const useBrandsStore = create<BrandsState>((set) => ({
             const res = await axiosInstance.get("/brands");
             set({ brands: res.data.data });
         } catch (error) {
-            console.log("Error in getAllBrands: " + error);
+            handleErrorMessage(error, "fetchBrands");
         } finally {
             set({ isLoading: false });
         }
