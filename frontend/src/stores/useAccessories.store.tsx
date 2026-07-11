@@ -68,11 +68,11 @@ interface AccessoriesState {
     categories: AcessoryCategoryObjects;
     accessories: Accessory[];
     selectedAccessoryId: number | null;
-    selectedSubcategoryName: string;
+    selectedSubCategoryName: string;
     selectedCategoryName: string;
 
     selectCategory: (name: string) => void;
-    selectSubcategory: (name: string) => void;
+    selectSubCategory: (name: string) => void;
     selectAccessory: (id: number) => void;
 
     fetchCategories: () => Promise<void>;
@@ -106,11 +106,11 @@ export const useAccessoriesStore = create<AccessoriesState>((set, get) => ({
     categories: {},
     accessories: [],
     selectedAccessoryId: null,
-    selectedSubcategoryName: "",
+    selectedSubCategoryName: "",
     selectedCategoryName: "",
 
     selectCategory: (name) => set({ selectedCategoryName: name }),
-    selectSubcategory: (name) => set({ selectedSubcategoryName: name }),
+    selectSubCategory: (name) => set({ selectedSubCategoryName: name }),
     selectAccessory: (id: number) => set({ selectedAccessoryId: id }),
 
     fetchCategories: async () => {
@@ -185,7 +185,7 @@ export const useAccessoriesStore = create<AccessoriesState>((set, get) => ({
     updateSubCategory: async (subcategoryForm, dialog : HTMLDialogElement) => {
         try {
             set({ isUpdatingCat: true });
-            const id = get().categories[get().selectedCategoryName].subcategories[get().selectedSubcategoryName].id
+            const id = get().categories[get().selectedCategoryName].subcategories[get().selectedSubCategoryName].id
             const res = await axiosInstance.put(SUBCATEGORY_URL + "/" + id, subcategoryForm);
             set((state) => ({ categories: { ...state.categories, [res.data.data.category.name]: res.data.data.category } }));
             toast.success("Subcategory updated successfully");
@@ -200,7 +200,7 @@ export const useAccessoriesStore = create<AccessoriesState>((set, get) => ({
     deleteSubCategory: async () => {
         try {
             set({ isUpdatingCat: true });
-            const id = get().categories[get().selectedCategoryName].subcategories[get().selectedSubcategoryName].id
+            const id = get().categories[get().selectedCategoryName].subcategories[get().selectedSubCategoryName].id
             await axiosInstance.delete(SUBCATEGORY_URL + "/" + id);
             set((state) => ({ categories: Object.fromEntries(Object.entries(state.categories).filter(([key]) => state.categories[key].id !== id)) }));
             toast.success("Subcategory deleted successfully");

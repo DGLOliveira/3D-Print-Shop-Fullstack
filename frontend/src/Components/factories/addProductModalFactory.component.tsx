@@ -1,6 +1,7 @@
 import { Plus, PenLine } from 'lucide-react'
+import { Fragment } from "react"
 
-export const ButtonFactory = ({ modalId, title, canEdit, setMode }: { modalId: string, title: string, canEdit: boolean, setMode: React.Dispatch<React.SetStateAction<string>> }) => {
+export const ButtonFactory = ({ modalId, title, canAdd, canEdit, setMode }: { modalId: string, title: string, canAdd: boolean, canEdit: boolean, setMode: React.Dispatch<React.SetStateAction<string>> }) => {
 
     const openModal = () => {
         const dialog = document.getElementById(modalId) as HTMLDialogElement | null
@@ -9,7 +10,7 @@ export const ButtonFactory = ({ modalId, title, canEdit, setMode }: { modalId: s
 
     return (
         <div>
-            <button className="btn btn-ghost w-fit ml-2 p-1" title={"Add New " + title} onClick={() => { openModal(); setMode("add"); }}>
+            <button disabled={!canAdd} className="btn btn-ghost w-fit ml-2 p-1" title={"Add New " + title} onClick={() => { openModal(); setMode("add"); }}>
                 <Plus />
             </button>
             <button disabled={!canEdit} className="btn btn-ghost w-fit ml-2 p-1" title={"Edit " + title} onClick={() => { openModal(); setMode("edit"); }}>
@@ -54,12 +55,16 @@ export const ModalFactory = ({ title, modalId, formTypes, mode, Content, handleS
         )
     }
 
-    const formElementFactory = (formType: FormType) => {
+    const formElementFactory = (formType: FormType, index: number) => {
         switch (formType.type) {
             case "input":
-                return <Input formType={formType} />
+                return <Fragment key={index}>
+                    <Input formType={formType} key={index} />
+                </Fragment>
             case "textarea":
-                return <TextArea formType={formType} />
+                return <Fragment key={index}>
+                    <TextArea formType={formType} />
+                </Fragment>
         }
     }
 
@@ -70,7 +75,7 @@ export const ModalFactory = ({ title, modalId, formTypes, mode, Content, handleS
                 <h3 className="font-bold text-xl w-full text-center mb-4">{title}</h3>
                 {Content}
                 <form onSubmit={handleSubmit}>
-                    {formTypes.map((formType) => formElementFactory(formType))}
+                    {formTypes.map((formType, index) => formElementFactory(formType, index))}
                     <div className="flex justify-center w-full m-1">
                         <button type="submit" className="btn">Submit</button>
                     </div>

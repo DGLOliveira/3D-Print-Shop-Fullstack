@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { AccessoryCategoryButtons, AccessoryCategoryModal } from './modals/AccessoryCategoryModal.component'
-import { AddAccessorySubCategoryButton, AddAccessorySubCategoryModal } from './modals/AddAccessorySubCategoryModal.component'
+import { AccessorySubCategoryButtons, AccessorySubCategoryModal } from './modals/AccessorySubCategoryModal.component.tsx'
 import { useAccessoriesStore } from '../stores/useAccessories.store.tsx'
 
 export const AddAccessoryModals = ({modalMode} : {modalMode: string}) => {
@@ -8,18 +8,17 @@ export const AddAccessoryModals = ({modalMode} : {modalMode: string}) => {
     return (
         <>
             <AccessoryCategoryModal modalMode={modalMode} />
-            <AddAccessorySubCategoryModal modalMode={modalMode} />
+            <AccessorySubCategoryModal modalMode={modalMode} />
         </>
     )
 }
 
-export const AddAccessoryForm = ({modalMode} : {modalMode: string}) => {
+export const AddAccessoryForm = ({setModalMode} : {setModalMode: React.Dispatch<React.SetStateAction<string>>}) => {
 
     const accessoryStore = useAccessoriesStore();
     const selectedCategoryName = accessoryStore.selectedCategoryName
-    const selectedSubcategoryName = accessoryStore.selectedSubcategoryName
+    const selectedSubCategoryName = accessoryStore.selectedSubCategoryName
 
-    const [accessoryCategory, setAccessoryCategory] = useState("")
     const [price, setPrice] = useState(0)
     const [discount, setDiscount] = useState(0)
     const [stock, setStock] = useState(0)
@@ -31,7 +30,7 @@ export const AddAccessoryForm = ({modalMode} : {modalMode: string}) => {
     },[])
 
     useEffect(()=>{
-        accessoryStore.selectSubcategory("")
+        accessoryStore.selectSubCategory("")
     },[selectedCategoryName])
 
     return (
@@ -39,22 +38,22 @@ export const AddAccessoryForm = ({modalMode} : {modalMode: string}) => {
 
             <label htmlFor="add-accessory-category">Accessory Category</label>
             <select id="accessory-category" name="accessory-category" className="select select-bordered w-full max-w-xs text-center" value={selectedCategoryName} onChange={(e) => accessoryStore.selectCategory(e.target.value)}>
-                <option disabled selected value="">Category</option>
+                <option disabled value="">Category</option>
                 {Object.keys(accessoryStore.categories).map((name, index) => 
                 <option key={index} value={name}>{name}</option>
                 )}
             </select>
-            <AccessoryCategoryButtons canEdit={selectedCategoryName !== ""} setModalMode={setAccessoryCategory} />
+            <AccessoryCategoryButtons canAdd={true} canEdit={selectedCategoryName !== ""} setModalMode={setModalMode} />
             
             <label htmlFor="add-accessory-subcategory">Accessory SubCategory</label>
-            <select id="accessory-subcategory" name="accessory-subcategory" className="select select-bordered w-full max-w-xs text-center" value={selectedSubcategoryName} onChange={(e) => accessoryStore.selectSubcategory(e.target.value)}>
-                <option disabled selected value="">SubCategory</option>
-                {Object.keys(accessoryStore.categories[selectedCategoryName].subcategories).map((name, index) => 
+            <select disabled={selectedCategoryName === ""} id="accessory-subcategory" name="accessory-subcategory" className="select select-bordered w-full max-w-xs text-center" value={selectedSubCategoryName} onChange={(e) => accessoryStore.selectSubCategory(e.target.value)}>
+                <option disabled value="">SubCategory</option>
+                {selectedCategoryName !== "" && Object.keys(accessoryStore.categories[selectedCategoryName].subcategories).map((name, index) => 
                 <option key={index} value={name}>{name}</option>
                 )}
             </select>
             <>
-                <AddAccessorySubCategoryButton />
+                <AccessorySubCategoryButtons canAdd={selectedCategoryName !== ""} canEdit={selectedSubCategoryName !== ""} setModalMode={setModalMode} />
             </>
 
             <label htmlFor="add-price"> Price</label>

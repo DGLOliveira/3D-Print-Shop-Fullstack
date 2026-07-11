@@ -4,8 +4,8 @@ import { ButtonFactory, ModalFactory } from "../factories/addProductModalFactory
 
 const modalId = "brand-modal";
 
-export const BrandModalButtons = ({ canEdit, setModalMode }: { canEdit: boolean, setModalMode: React.Dispatch<React.SetStateAction<string>> }) => {
-    return <ButtonFactory modalId={modalId} title="Brand" canEdit={canEdit} setMode={setModalMode} />
+export const BrandModalButtons = ({ canAdd, canEdit, setModalMode }: { canAdd: boolean, canEdit: boolean, setModalMode: React.Dispatch<React.SetStateAction<string>> }) => {
+    return <ButtonFactory modalId={modalId} title="Brand" canAdd={canAdd} canEdit={canEdit} setMode={setModalMode} />
 }
 
 export const BrandModal = ({ brandId, modalMode }: { brandId: number, modalMode: string }) => {

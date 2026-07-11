@@ -4,15 +4,15 @@ import { useAccessoriesStore, type AccessoryCategoryForm } from '../../stores/us
 
 const modalId = "accessory-category-modal";
 
-export const AccessoryCategoryButtons = ({ canEdit, setModalMode }: { canEdit: boolean, setModalMode: React.Dispatch<React.SetStateAction<string>> }) => {
-    return <ButtonFactory modalId={modalId} title="Brand" canEdit={canEdit} setMode={setModalMode} />
+export const AccessoryCategoryButtons = ({ canAdd, canEdit, setModalMode }: {canAdd : boolean, canEdit: boolean, setModalMode: React.Dispatch<React.SetStateAction<string>> }) => {
+    return <ButtonFactory modalId={modalId} title="Brand" canAdd={canAdd} canEdit={canEdit} setMode={setModalMode} />
 }
 
 
 export const AccessoryCategoryModal = ({ modalMode }: { modalMode: string }) => {
 
     const accessoryStore = useAccessoriesStore();
-    const [accessoryForm, setAccessoryForm] : [AccessoryCategoryForm, React.Dispatch<React.SetStateAction<AccessoryCategoryForm>>] = useState({
+    const [categoryForm, setCategoryForm] : [AccessoryCategoryForm, React.Dispatch<React.SetStateAction<AccessoryCategoryForm>>] = useState({
         name: "",
     });
 
@@ -23,17 +23,17 @@ export const AccessoryCategoryModal = ({ modalMode }: { modalMode: string }) => 
         {
             type: "input",
             label: "Name",
-            value: accessoryForm.name,
-            onChange: (e: React.ChangeEvent<HTMLInputElement>) => setAccessoryForm({ ...accessoryForm, name: e.target.value })
+            value: categoryForm.name,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => setCategoryForm({ ...categoryForm, name: e.target.value })
         },
     ]
     
 
     useEffect(()=>{
         if (modalMode === "edit") {
-            setAccessoryForm({name: accessoryStore.selectedCategoryName})
+            setCategoryForm({name: accessoryStore.selectedCategoryName})
         }else{
-            setAccessoryForm({name: ""})
+            setCategoryForm({name: ""})
         }
     },[modalMode])
 
@@ -41,9 +41,9 @@ export const AccessoryCategoryModal = ({ modalMode }: { modalMode: string }) => 
         e.preventDefault();
         const dialog = document.getElementById(modalId) as HTMLDialogElement
         if (modalMode === "add") {
-            accessoryStore.createCategory(accessoryForm, dialog);
+            accessoryStore.createCategory(categoryForm, dialog);
         } else {
-            accessoryStore.updateCategory(accessoryForm, dialog);
+            accessoryStore.updateCategory(categoryForm, dialog);
         }
     }
 

@@ -94,17 +94,17 @@ const [modalMode, setModalMode] = useState("add");
                         {/* Category */}
                         <label htmlFor="add-brand">Brand</label>
                         <select id="add-brand" name="brand" className="select select-bordered w-full max-w-xs text-center" value={brandId} onChange={(e) => setBrandId(Number(e.target.value))}>
-                            <option disabled selected value={-1}>Brand</option>
+                            <option disabled value={-1}>Brand</option>
                             {brandStore.brands.map((brand, index) =>
                                 <option key={index} value={brand.id}>{brand.name}</option>
                             )}
                         </select>
-                        <BrandModalButtons canEdit={brandId !== -1} setModalMode={setModalMode} />
+                        <BrandModalButtons canAdd={true} canEdit={brandId !== -1} setModalMode={setModalMode} />
                         
 
                         <label htmlFor="add-category">Category</label>
                         <select id="add-category" name="category" className="select select-bordered w-full max-w-xs text-center" value={category} onChange={(e) => setCategory(e.target.value)}>
-                            <option value="" disabled selected>Category</option>
+                            <option value="" disabled>Category</option>
                             <option value="Print">Print</option>
                             <option value="Material">Material</option>
                             <option value="Hardware">Hardware</option>
