@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { toast } from "react-hot-toast";
 import { axiosInstance } from "../lib/axios.lib.ts";
+import handleErrorMessage from "../utils/handleErrorMessage.util.tsx";
 
 export interface BrandForm {
     name: string;
@@ -29,7 +30,7 @@ interface BrandsState {
     fetchBrands: () => Promise<void>;
     createBrand: (brandForm: BrandForm, dialog: HTMLDialogElement) => Promise<void>;
     updateBrand: (id: number, brandForm: BrandForm, dialog: HTMLDialogElement) => Promise<void>;
-    deleteBrand: (id: number, dialog: HTMLDialogElement) => Promise<void>;
+    deleteBrand: (id: number) => Promise<void>;
 }
 
 
@@ -60,8 +61,7 @@ export const useBrandsStore = create<BrandsState>((set) => ({
             toast.success("Brand created successfully");
             dialog.close();
         } catch (error) {
-            toast.error(error.response.data.message);
-            console.log("Error in createBrand: " + error);
+            handleErrorMessage(error, "createBrand");
         } finally {
             set({ isCreating: false });
         }
@@ -71,36 +71,26 @@ export const useBrandsStore = create<BrandsState>((set) => ({
         try {
             set({ isUpdating: true });
             const res = await axiosInstance.put("/brands/" + id, brandForm);
-            console.log(res.data)
             set((state) => ({ brands: state.brands.map((brand) => brand.id === id ? res.data.data[0] : brand) }));
             toast.success("Brand updated successfully");
             dialog.close();
         } catch (error) {
-            console.log("Error in updateBrand: " + error);
-            toast.error(error.response.data.message);
+            handleErrorMessage(error, "updateBrand");
         } finally {
             set({ isUpdating: false });
         }
     },
 
-    deleteBrand: async (id, dialog) => {
+    deleteBrand: async (id) => {
         try {
             set({ isUpdating: true });
             await axiosInstance.delete("/brands/" + id);
             set((state) => ({ brands: state.brands.filter((brand) => brand.id !== id) }));
             toast.success("Brand deleted successfully");
-            dialog.close();
         } catch (error) {
-            toast.error(error.response.data.message);
-            console.log("Error in delete Brand: " + error);
+            handleErrorMessage(error, "deleteBrand");
         } finally {
             set({ isUpdating: false });
         }
     }
 }))
-
-/*
-export const useAccessoriesStore = create<AccessoriesState>((set) => ({
-    
-}))
-*/
