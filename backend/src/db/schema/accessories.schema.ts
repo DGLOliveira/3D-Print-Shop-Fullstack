@@ -51,7 +51,6 @@ export const accessoriesImagesTable = pgTable(
     "accessories_images", 
     {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    name: varchar({ length: 255 }).unique().notNull(),
     accessoryId: integer("accessory_id").references(() => accessoriesTable.id).notNull(),
     image_url: varchar({ length: 255 }).notNull(), //Image url is on an external service
     index: smallint().notNull(),

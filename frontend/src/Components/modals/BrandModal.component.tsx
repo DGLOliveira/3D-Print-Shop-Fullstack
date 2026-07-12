@@ -8,9 +8,9 @@ export const BrandModalButtons = ({ canAdd, canEdit, setModalMode }: { canAdd: b
     return <ButtonFactory modalId={modalId} title="Brand" canAdd={canAdd} canEdit={canEdit} setMode={setModalMode} />
 }
 
-export const BrandModal = ({ brandId, modalMode }: { brandId: number, modalMode: string }) => {
+export const BrandModal = ({ modalMode }: { modalMode: string }) => {
 
-    const brandStore = useBrandsStore();
+    const { brands, isLoading, isCreating, isUpdating, selectedBrand, createBrand, updateBrand, deleteBrand} = useBrandsStore();
 
     const [logoBackground, setLogoBackground] = useState("light");
     const [brandForm, setBrandForm]: [BrandForm, React.Dispatch<React.SetStateAction<BrandForm>>] = useState({
@@ -58,31 +58,31 @@ export const BrandModal = ({ brandId, modalMode }: { brandId: number, modalMode:
                 logo: ""
             })
         } else {
-            const foundBrand = brandStore.brands.find(brand => brand.id === brandId);
-            if (foundBrand) {
-                console.log(foundBrand)
+            if (selectedBrand !== null) {
                 setBrandForm({
-                    name: foundBrand.name,
-                    summary: foundBrand.summary === null ? "" : foundBrand.summary,
-                    website: foundBrand.website,
-                    logo: foundBrand.logo === null ? "" : foundBrand.logo
+                    name: brands[selectedBrand].name,
+                    summary: brands[selectedBrand].summary === null ? "" : brands[selectedBrand].summary,
+                    website: brands[selectedBrand].website,
+                    logo: brands[selectedBrand].logo === null ? "" : brands[selectedBrand].logo
                 })
             }
         }
-    }, [brandId, modalMode])
+    }, [selectedBrand, modalMode])
 
     const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         const dialog = document.getElementById(modalId) as HTMLDialogElement
         if (modalMode === "add") {
-            brandStore.createBrand(brandForm, dialog);
+            createBrand(brandForm, dialog);
         } else {
-            brandStore.updateBrand(brandId, brandForm, dialog);
+            if (selectedBrand === null) return
+            updateBrand(brands[selectedBrand].id, brandForm, dialog);
         }
     }
 
     const handleDelete = () => {
-        brandStore.deleteBrand(brandId);
+        if (selectedBrand === null) return
+        deleteBrand(brands[selectedBrand].id);
     }
 
     const LogoPreview = () => {

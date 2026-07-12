@@ -27,6 +27,7 @@ interface BrandsState {
     isUpdating: boolean;
     brands: [] | BrandsArray;
     selectedBrand: number | null;
+    selectBrand: (index: number) => void;
     fetchBrands: () => Promise<void>;
     createBrand: (brandForm: BrandForm, dialog: HTMLDialogElement) => Promise<void>;
     updateBrand: (id: number, brandForm: BrandForm, dialog: HTMLDialogElement) => Promise<void>;
@@ -34,12 +35,16 @@ interface BrandsState {
 }
 
 
-export const useBrandsStore = create<BrandsState>((set) => ({
+export const useBrandsStore = create<BrandsState>((set, get) => ({
     isLoading: false,
     isCreating: false,
     isUpdating: false,
     brands: [],
     selectedBrand: null,
+
+    selectBrand: (index) => {
+        set({ selectedBrand: index });
+    },
 
     fetchBrands: async () => {
         try {
@@ -57,13 +62,14 @@ export const useBrandsStore = create<BrandsState>((set) => ({
         try {
             set({ isCreating: true });
             const res = await axiosInstance.post("/brands", brandForm);
-            set((state) => ({ brands: [...state.brands, res.data.data] }));
+            set((state) => ({ brands: [...state.brands, res.data.data[0]] }));
             toast.success("Brand created successfully");
             dialog.close();
         } catch (error) {
             handleErrorMessage(error, "createBrand");
         } finally {
             set({ isCreating: false });
+            set({ selectedBrand: get().brands.length - 1});
         }
     },
 
@@ -91,6 +97,7 @@ export const useBrandsStore = create<BrandsState>((set) => ({
             handleErrorMessage(error, "deleteBrand");
         } finally {
             set({ isUpdating: false });
+            set({ selectedBrand: null });
         }
     }
 }))

@@ -1,42 +1,69 @@
 import { useState, useEffect } from 'react'
+import { Euro, Percent, Boxes } from 'lucide-react'
+
 import { AccessoryCategoryButtons, AccessoryCategoryModal } from './modals/AccessoryCategoryModal.component'
 import { AccessorySubCategoryButtons, AccessorySubCategoryModal } from './modals/AccessorySubCategoryModal.component.tsx'
-import { useAccessoriesStore } from '../stores/useAccessories.store.tsx'
+import { useAccessoriesStore, type AccessoryForm } from '../stores/useAccessories.store.tsx'
+import { useBrandsStore } from '../stores/useBrands.store.tsx'
+import StatusModalFactory from './factories/addProductStatusModalFactory.component.tsx'
 
-export const AddAccessoryModals = ({ modalMode }: { modalMode: string }) => {
 
+export const AddAccessoryModals = ({ modalMode, submit }: { modalMode: string, submit: boolean }) => {
+
+    const { isUpdatingCat, updatingAccMsg } = useAccessoriesStore();
     return (
         <>
+            <StatusModalFactory message={updatingAccMsg} isBusy={isUpdatingCat} isActive={submit} />
             <AccessoryCategoryModal modalMode={modalMode} />
             <AccessorySubCategoryModal modalMode={modalMode} />
         </>
     )
 }
 
-export const AddAccessoryForm = ({ setModalMode }: { setModalMode: React.Dispatch<React.SetStateAction<string>> }) => {
+export const AddAccessoryForm = ({ setModalMode, name, subname, grouping, images, setImagesState, description, publish, submit }: { setModalMode: React.Dispatch<React.SetStateAction<string>>, name: string, subname: string, grouping: string, images: File[] | [], setImagesState: React.Dispatch<React.SetStateAction<string[]>>, description: string, publish: boolean, submit: boolean }) => {
 
-    const { selectCategory, selectSubCategory, selectAccessory, accessories, categories, isUpdatingCat, selectedCategoryName, selectedSubCategoryName, fetchAccessories, fetchCategories } = useAccessoriesStore();
+    const { selectCategory, selectSubCategory, categories, isUpdatingCat, selectedCategoryName, selectedSubCategoryName, createAccessory } = useAccessoriesStore();
 
-    const [price, setPrice] = useState(0)
-    const [discount, setDiscount] = useState(0)
-    const [stock, setStock] = useState(0)
+    const { selectedBrand, brands } = useBrandsStore();
+
+    const [accessoryForm, setAccessoryForm]: [AccessoryForm, React.Dispatch<React.SetStateAction<AccessoryForm>>] = useState({
+        name,
+        subname,
+        grouping,
+        brandId: selectedBrand === null ? -1 : selectedBrand,
+        categoryId: selectedCategoryName === "" ? -1 : categories[selectedCategoryName].id,
+        subcategoryId: selectedSubCategoryName === "" ? -1 : categories[selectedCategoryName].subcategories[selectedSubCategoryName].id,
+        price: 0,
+        discount: 0,
+        stock: 0,
+        description,
+        publish
+    });
 
 
     useEffect(() => {
-        fetchAccessories()
-        fetchCategories()
-    }, [])
-
-    useEffect(() => {
-        selectSubCategory("")
-    }, [selectedCategoryName])
+        if (submit) {
+            const finalAccessoryForm : AccessoryForm = {
+                ...accessoryForm,
+                name,
+                subname,
+                grouping,
+                brandId: selectedBrand === null ? -1 : brands[selectedBrand].id ,
+                categoryId: selectedCategoryName === "" ? -1 : categories[selectedCategoryName].id,
+                subcategoryId: selectedSubCategoryName === "" ? -1 : categories[selectedCategoryName].subcategories[selectedSubCategoryName].id,
+                description,
+                publish
+            }
+            setAccessoryForm(finalAccessoryForm)
+            createAccessory(finalAccessoryForm, images, setImagesState)
+        }
+    }, [submit])
 
     return (
         <>
-
             <label htmlFor="add-accessory-category">Accessory Category</label>
             {isUpdatingCat ? <div>Loading...</div> :
-                <select id="accessory-category" name="accessory-category" className="select select-bordered w-full max-w-xs text-center" value={selectedCategoryName} onChange={(e) => selectCategory(e.target.value)}>
+                <select required id="accessory-category" name="accessory-category" className="select select-bordered w-full max-w-xs text-center" value={selectedCategoryName} onChange={(e) => selectCategory(e.target.value)}>
                     <option disabled value="">Category</option>
                     {Object.keys(categories).map((name, index) =>
                         <option key={index} value={name}>{name}</option>
@@ -56,15 +83,30 @@ export const AddAccessoryForm = ({ setModalMode }: { setModalMode: React.Dispatc
             </>
 
             <label htmlFor="add-price"> Price</label>
-            <input id="add-price" type="number" step="0.01" placeholder="Price" min="1" className="input input-bordered w-40 max-w-xs text-center" value={price} onChange={(e) => setPrice(parseFloat(e.target.value))} />
+            <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-1">
+                    <Euro className="size-5 text-base-content/40" />
+                </div>
+                <input required id="add-price" type="number" step="0.01" placeholder="Price" min="1" className="input input-bordered w-40 max-w-xs text-center" value={accessoryForm.price} onChange={(e) => setAccessoryForm({ ...accessoryForm, price: parseFloat(e.target.value) })} />
+            </div>
             <span />
 
             <label htmlFor="add-discount"> Discount</label>
-            <input id="add-discount" type="number" min="0" max="90" step="1" placeholder="Discount%" className="input input-bordered w-40 max-w-xs text-center" value={discount} onChange={(e) => setDiscount(parseInt(e.target.value))} />
+            <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-1">
+                    <Percent className="size-5 text-base-content/40" />
+                </div>
+                <input id="add-discount" type="number" min="0" max="90" step="1" placeholder="Discount%" className="input input-bordered w-40 max-w-xs text-center" value={accessoryForm.discount} onChange={(e) => setAccessoryForm({ ...accessoryForm, discount: parseInt(e.target.value) })} onWheel={(e) => e.currentTarget.blur()} />
+            </div>
             <span />
 
             <label htmlFor="add-stock"> Stock</label>
-            <input id="add-stock" type="number" min="0" step="1" placeholder="Stock" className="input input-bordered w-40 max-w-xs text-center" value={stock} onChange={(e) => setStock(parseInt(e.target.value))} />
+            <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-1">
+                    <Boxes className="size-5 text-base-content/40" />
+                </div>
+                <input id="add-stock" type="number" min="0" step="1" placeholder="Stock" className="input input-bordered w-40 max-w-xs text-center" value={accessoryForm.stock} onChange={(e) => setAccessoryForm({ ...accessoryForm, stock: parseInt(e.target.value) })} />
+            </div>
             <span />
         </>
     )
