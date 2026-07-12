@@ -156,6 +156,12 @@ export const deleteAccessoryCategory = async (req, res) => {
         return res.status(204).json({ success: true, data: result });
     } catch (error) {
         console.error(error);
+        if(error.cause.detail.includes("accessories_sub_categories")){
+            return res.status(400).json({ success: false, message: "Cannot delete category with associated subcategories" });
+        }
+        if(error.cause.detail.includes("accessories")){
+            return res.status(400).json({ success: false, message: "Cannot delete category with associated accessories" });
+        }
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
@@ -190,6 +196,9 @@ export const deleteSubAccessoryCategory = async (req, res) => {
         return res.status(204).json({ success: true, data: result });
     } catch (error) {
         console.error(error);
+        if(error.cause.detail.includes("accessories")){
+            return res.status(400).json({ success: false, message: "Cannot delete subcategory with associated accessories" });
+        }
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }

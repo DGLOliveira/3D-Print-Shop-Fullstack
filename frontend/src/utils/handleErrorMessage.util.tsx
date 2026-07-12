@@ -2,9 +2,7 @@ import { toast } from "react-hot-toast";
 
 export default function handleErrorMessage(error: unknown, location: string) {
     let message = ""
-    if (error instanceof Error) {
-        message = error.message;
-    }else if (typeof error === "object" && error !== null && "response" in error) {
+    if (typeof error === "object" && error !== null && "response" in error) {
         const response = (error as { response?: unknown }).response as { data?: unknown } | undefined;
         if (
             response?.data &&
@@ -14,6 +12,9 @@ export default function handleErrorMessage(error: unknown, location: string) {
         ) {
             message = String((response.data as { message?: unknown }).message);
         }
+    }
+    else if (error instanceof Error) {
+        message = error.message;
     }
     else{
         message = "An unexpected error occurred";
