@@ -30,19 +30,19 @@ export interface AccessoryCategoryForm {
     name: string;
 }
 
-interface ProductImage {
+export interface ProductImage {
     id: number;
     image_url: string;
 }
 
 
-interface Accessory {
+export interface Accessory {
     name: string;
     subname: string;
     grouping: string;
-    brandName: string;
-    subcategoryName: string;
-    categoryName: string;
+    brandId: number;
+    subcategoryId: number;
+    categoryId: number;
     images: ProductImage[];
     price: number;
     discount: number;

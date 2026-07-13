@@ -1,7 +1,7 @@
 
 const ProductCardSkeleton = () => {
     return (
-        <div className="card bg-base-200 h-96 shadow-sm">
+        <div className="card bg-base-200 h-96 shadow-sm border border-neutral">
             <figure className="h-2/3">
                 <div className="skeleton w-full h-full"></div>
             </figure>

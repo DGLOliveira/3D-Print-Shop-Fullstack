@@ -1,31 +1,13 @@
-import { useState, useEffect } from 'react'
-import { useNavigate, createSearchParams } from 'react-router'
-
-
 import AddProductCard from "./AddProductCard.component.tsx"
 import ProductCard from "./ProductCard.component.tsx"
 import ProductCardSkeleton from "./skeletons/ProductCardSkeleton.component.tsx"
 
 import { type Accessories } from '../stores/useAccessories.store.tsx'
 
-interface ProductCart {
-  title: string,
-  image: string,
-  price: number,
-  discount: number
-}
-
 const StoreList = ({ products }: { products: Accessories }) => {
 
   // products should match the Accessories type (a record of products)
 
-  const navigate = useNavigate()
-  const navToPrint = (prodId: string) => {
-    navigate({
-      pathname: "/store/product",
-      search: createSearchParams({ prodId }).toString(),
-    })
-  }
 
   return (
     <div className="w-full h-full">
@@ -36,6 +18,7 @@ const StoreList = ({ products }: { products: Accessories }) => {
           return (
             <ProductCard
               key={prodId}
+              id={prodId}
               title={prod.name}
               image={prod.images[0] ? prod.images[0].image_url : ""}
               price={prod.price}
