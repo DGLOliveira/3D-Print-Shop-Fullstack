@@ -1,24 +1,29 @@
-import React from 'react'
+import { PenLine } from "lucide-react"
 
-const ProductCard = (props : {title : string, price : number, discount : number, image : string}) => {
-    const {title, price, discount, image} = props
+const ProductCard = (props: { title: string, price: number, discount: number, image: string }) => {
+    const { title, price, discount, image } = props
     return (
-    <div className="card bg-base-100 w-96 shadow-sm">
-        <figure>
-            <img
-                src={image ? image : "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"}
-                alt="Product Image" />
-        </figure>
-        <div className="card-body">
-            <h2 className="card-title">{title}</h2>
-            <div className="card-actions justify-between">
-                {discount > 0 ? 
-                <p><span className="line-through text-gray-400">{price} €</span> {price - (price * discount / 100)}€</p> 
-                : <p>{price}€</p>}
-                <button className="btn btn-primary">Add to cart</button>
+        <div className="card bg-base-100 shadow-sm border border-neutral">
+            <figure className="w-full h-50">
+                <img
+                    className="w-full h-50 object-contain"
+                    src={image ? image : "https://stackoverflow.com/does-not-exist.png"}
+                     />
+            </figure>
+            <div className="card-body">
+                <h2 className="card-title">{title}</h2>
+                {discount > 0 ?
+                    <p><span className="line-through text-gray-400">{price} €</span> {price - Math.round(price * discount)/100}€</p>
+                    : <p>{price}€</p>}
+                <div className="card-actions">
+                    <button className="btn btn-primary">Check Product</button>
+                    <button className="btn btn-primary">
+                        <PenLine className="size-4" />
+                        Edit Product
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
     )
 }
 

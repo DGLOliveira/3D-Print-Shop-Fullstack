@@ -173,12 +173,36 @@ export const deleteAccessoryImage = async (req, res) => {
     }
 };
 
+function formatAccessories(result) {
+    let formattedAccessories = {}
+    let test = {}
+    result.forEach((item) => {
+        let entry = formattedAccessories[item.accessories.id]
+        if (!entry) {
+            entry = structuredClone(item.accessories);
+            entry.images = [];
+            delete entry.id
+        }
+        if (item.accessories_images) {
+            entry.images.push(item.accessories_images);
+            delete entry.images[entry.images.length - 1].accessoryId
+        }
+        formattedAccessories[item.accessories.id] = entry
+    })
+    Object.keys(formattedAccessories).forEach((key) => {
+        if (!formattedAccessories[key].images) {
+            formattedAccessories[key].images.sort((a, b) => a.index - b.index)
+        }
+    })
+    return formattedAccessories
 
+}
 //TODO Get by pagination and get thubnail image
 export const getAllAccessories = async (req, res) => {
     try {
-        const result = await db.select().from(accessoriesTable);
-        return res.status(200).json({ success: true, data: result });
+        const result = await db.select().from(accessoriesTable).leftJoin(accessoriesImagesTable, eq(accessoriesTable.id, accessoriesImagesTable.accessoryId));
+        const formattedAccesories = formatAccessories(result)
+        return res.status(200).json({ success: true, data: formattedAccesories });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: "Internal server error" });

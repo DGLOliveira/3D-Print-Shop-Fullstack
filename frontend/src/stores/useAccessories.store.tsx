@@ -30,21 +30,29 @@ export interface AccessoryCategoryForm {
     name: string;
 }
 
+interface ProductImage {
+    id: number;
+    image_url: string;
+}
+
 
 interface Accessory {
-    id: number;
     name: string;
     subname: string;
     grouping: string;
     brandName: string;
     subcategoryName: string;
     categoryName: string;
-    images: string[];
+    images: ProductImage[];
     price: number;
     discount: number;
     stock: number;
     description: string;
     publish: boolean;
+}
+
+export interface Accessories {
+    [key: number]: Accessory;
 }
 
 export interface AccessoryForm {
@@ -66,7 +74,7 @@ interface AccessoriesState {
     isUpdatingAcc: boolean;
     updatingAccMsg: string;
     categories: AcessoryCategoryObjects;
-    accessories: Accessory[];
+    accessories: Accessories;
     selectedAccessoryId: number | null;
     selectedSubCategoryName: string;
     selectedCategoryName: string;
@@ -104,7 +112,7 @@ export const useAccessoriesStore = create<AccessoriesState>((set, get) => ({
     isUpdatingAcc: false,
     updatingAccMsg: "",
     categories: {},
-    accessories: [],
+    accessories: {},
     selectedAccessoryId: null,
     selectedSubCategoryName: "",
     selectedCategoryName: "",
@@ -247,6 +255,7 @@ export const useAccessoriesStore = create<AccessoriesState>((set, get) => ({
             //newAccessories.map((accessory) => accessory.id === accessoryId ? { ...accessory, images: [...accessory.images, newEntry] } : accessory)
             //set({ accessories: newAccessories });
             setImagesState((prev) => ({ ...prev, [index]: "Uploaded" }))
+            toast.success("Image #" + index + "uploaded successfully");
         } catch (error) {
             handleErrorMessage(error, "createAccessoryImage")
             setImagesState((prev) => ({ ...prev, [index]: "Error" }))
@@ -289,7 +298,7 @@ export const useAccessoriesStore = create<AccessoriesState>((set, get) => ({
         try {
             set({ isUpdatingAcc: true });
             const res = await axiosInstance.put(ACCESSORY_URL + "/" + id, accessoryForm);
-            set((state) => ({ accessories: state.accessories.map((accessory) => accessory.id === id ? res.data.data : accessory) }));
+            //set((state) => ({ accessories: state.accessories.map((accessory) => accessory.id === id ? res.data.data : accessory) }));
             toast.success("Accessory updated successfully");
         } catch (error) {
             handleErrorMessage(error, "updateAccessory")
@@ -302,7 +311,7 @@ export const useAccessoriesStore = create<AccessoriesState>((set, get) => ({
         try {
             set({ isUpdatingAcc: true });
             await axiosInstance.delete(ACCESSORY_URL + "/" + id);
-            set((state) => ({ accessories: state.accessories.filter((accessory) => accessory.id !== id) }));
+            //set((state) => ({ accessories: state.accessories.filter((accessory) => accessory.id !== id) }));
             toast.success("Accessory deleted successfully");
         } catch (error) {
             handleErrorMessage(error, "deleteAccessory")

@@ -5,6 +5,9 @@ import StoreList from '../../Components/StoreList.component.tsx'
 import StoreFilter from '../../Components/StoreFilter.component.tsx'
 
 
+import { useBrandsStore, type Brand } from "../../stores/useBrands.store.tsx"
+import { useAccessoriesStore, type Accessories } from "../../stores/useAccessories.store.tsx"
+
 import hardware from "../../assets/3D_Hardware_Bundle.webp"
 import accessories from "../../assets/3D_Accessories_Bundle.webp"
 import materials from "../../assets/3D_Filament_Bundle.webp"
@@ -23,6 +26,9 @@ const StorePage = () => {
   const location = useLocation();
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+  
+  const { accessories } = useAccessoriesStore()
+  const { brands } = useBrandsStore()
 
   function getValidSearchCategory() {
     let category = searchParams.get("category")
@@ -34,6 +40,21 @@ const StorePage = () => {
 
   const [category, setCategory] = useState(getValidSearchCategory())
 
+  
+  const [products, setProducts] = useState<Accessories>({} as Accessories)
+
+  useEffect(() => {
+    switch (category) {
+      case "Accessories":
+        setProducts(accessories)
+        break
+      default:
+        setProducts({})
+        break
+    }
+  }, [accessories])
+
+  // ⚠️WARNING: category does not update when already on the store page and navigation is made from navbar or footer
   // update the search params
   useEffect(() => {
     let newSearchParams = {}
@@ -82,7 +103,7 @@ const StorePage = () => {
             :
             <div className="flex flex-row w-full h-full relative">
               <StoreFilter />
-              <StoreList />
+              <StoreList products={products} />
             </div>
           }
         </>
