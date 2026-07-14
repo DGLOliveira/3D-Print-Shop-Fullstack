@@ -1,7 +1,6 @@
 //NOTE: Create a separate schema for discount seasons
 
-import { sql } from "drizzle-orm";
-import {primaryKey , integer, pgTable, boolean, varchar, decimal, timestamp, smallint, check, text, pgEnum, unique } from "drizzle-orm/pg-core";
+import {primaryKey , integer, pgTable, boolean, varchar, decimal, timestamp, smallint, text } from "drizzle-orm/pg-core";
 
 
 const timestamps = {
@@ -14,7 +13,7 @@ const timestamps = {
 
 
 export const primaryCategoriesTable = pgTable(
-    "accessories_categories",
+    "primary_categories",
     {
         id: integer().primaryKey().generatedAlwaysAsIdentity(),
         name: varchar({ length: 255 }).unique().notNull(),
@@ -24,7 +23,7 @@ export const primaryCategoriesTable = pgTable(
 )
 
 export const secondaryCategoriesTable = pgTable(
-    "accessories_categories",
+    "secondary_categories",
     {
         id: integer().primaryKey().generatedAlwaysAsIdentity(),
         primary_id: integer("primary_id").references(() => primaryCategoriesTable.id).notNull(),
@@ -35,7 +34,7 @@ export const secondaryCategoriesTable = pgTable(
 )
 
 export const terciaryCategoriesTable = pgTable(
-    "accessories_categories",
+    "terciary_categories",
     {
         id: integer().primaryKey().generatedAlwaysAsIdentity(),
         secondary_id: integer("secondary_id").references(() => secondaryCategoriesTable.id).notNull(),
@@ -133,6 +132,9 @@ export const productDescriptionsTable = pgTable(
         ...timestamps
     }
 )
+
+
+//----------------------------------Relational Tables----------------------------------//
 
 
 export const descriptionToVersionsTable = pgTable(

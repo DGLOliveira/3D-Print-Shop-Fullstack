@@ -110,12 +110,12 @@ export const deletePrimaryCategory = async (req, res) => {
         await db.delete(primaryCategoriesTable).where(eq(primaryCategoriesTable.id, id));
         return res.status(200).json({ success: true, message: "Category deleted successfully" });
     } catch (error) {
-        console.error(error);
         if (error.cause.detail.includes("secondary_categories")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated subcategories" });
         }else if(error.cause.detail.includes("models")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated products" });
         }
+        console.error(error);
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
@@ -176,12 +176,12 @@ export const deleteSecondaryCategory = async (req, res) => {
         await db.delete(secondaryCategoriesTable).where(eq(secondaryCategoriesTable.id, id));
         return res.status(200).json({ success: true, message: "Category deleted successfully" });
     } catch (error) {
-        console.error(error);
         if (error.cause.detail.includes("terciary_categories")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated subcategories" });
         }else if(error.cause.detail.includes("models")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated products" });
         }
+        console.error(error);
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
@@ -242,10 +242,10 @@ export const deleteTerciaryCategory = async (req, res) => {
         await db.delete(terciaryCategoriesTable).where(eq(terciaryCategoriesTable.id, id));
         return res.status(200).json({ success: true, message: "Category deleted successfully" });
     } catch (error) {
-        console.error(error); 
         if(error.cause.detail.includes("models")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated products" });
         }
+        console.error(error); 
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }

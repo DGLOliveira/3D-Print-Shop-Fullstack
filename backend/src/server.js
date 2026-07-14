@@ -4,9 +4,9 @@ import morgan from "morgan";
 import helmet from "helmet";
 import dotenv from "dotenv";
 
-import productRouter from "./routers/products.route.js";
-//import materialRouter from "./routers/materials.route.js";
-import brandRouter from "./routers/brands.route.js";
+import productRouter from "./routers/products.router.js";
+import categoryRouter from "./routers/categories.router.js";
+import brandRouter from "./routers/brands.router.js";
 
 dotenv.config();
 
@@ -23,9 +23,9 @@ app.use(helmet());
 app.use(express.json());
 
 
-app.use("/api/products", productRouter);
-//app.use("/api/materials", materialRouter);
-app.use("/api/brands", brandRouter);
+app.use("/api/v1/products", productRouter);
+app.use("/api/v1/categories", categoryRouter);
+app.use("/api/v1/brands", brandRouter);
 
 
 app.listen(PORT, () => {

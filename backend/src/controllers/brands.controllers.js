@@ -66,10 +66,10 @@ export const deleteBrand = async (req, res) => {
         const result = await db.delete(brandsTable).where(eq(brandsTable.id, id));
         return res.status(200).json({ success: true, message: "Brand deleted successfully" });
     } catch (error) {
-        console.error(error);
         if(error.cause.detail.includes("models")) {
             return res.status(409).json({ success: false, message: "Cannot delete Brand with associated Products" });
         }
+        console.error(error);
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
