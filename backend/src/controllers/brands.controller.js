@@ -1,127 +1,72 @@
 import { eq, lt, gte, ne } from 'drizzle-orm';
+import cloudinary from "../lib/cloudinary.lib.js";
 import { db } from "../db/index.ts";
-import { brandsTable } from "../db/schema/brands.schema.ts";
+import { brandsTable } from "../db/schema/products.schema.ts";
 
-const isValidURL = (urlString)=> {
-      try { 
-          return Boolean(new URL(urlString)); 
-      }
-      catch(e){ 
-          return false; 
-      }
-  }
 
 export const getAllBrands = async (req, res) => {
     try {
         const result = await db.select().from(brandsTable);
-        return res.status(200).json({success: true, data: result});
-    }catch (error) {
-        console.log(error);
-        return res.status(500).json({success: false, message: "Internal server error"});
-    };
-}
-
-export const getSingleBrandById = async (req, res) => {
-    try {
-        const result = await db.select().from(brandsTable).where(eq(brandsTable.id, req.params.id));
-        if(result.length === 0) {
-            return res.status(404).json({success: false, message: "Brand not found"});
-        }
-        return res.status(200).json({success: true, data: result});
+        return res.status(200).json({ success: true, data: result });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({success: false, message: "Internal server error"});
-    }
+        console.log(error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    };
 }
 
 export const createBrand = async (req, res) => {
     const { name, logo, summary, website } = req.body;
-    const newBrand = { };
-    if(!name || !website) {
-        return res.status(400).json({success: false, message: "Missing required fields"});
-    }else{
-        newBrand.name = name;
-        newBrand.website = website;
+    if (!name || !website || !logo || !summary) {
+        return res.status(400).json({ success: false, message: "Missing required fields" });
     }
-/* TODO: Fix isValidURL function to account for http:// and https://
-        console.log(website)
-    //Validate website
-    if(isValidURL(website)) {
-        return res.status(400).json({success: false, message: "Invalid website url"});
-    }
-    //Validate logo
-    if(logo !== undefined) {
-        if(isValidURL(logo)) {
-            return res.status(400).json({success: false, message: "Invalid logo url"});
-        }else{
-            newBrand.logo = logo;
+    const newBrand = { name, website, summary, image_url: "" };
+    try {
+        //Check if logo was sent, if so, upload it
+        if (logo !== "") {
+            const url = await cloudinary.uploader.upload(image);
+            newBrand.image_url = url.secure_url;
         }
-    }*/
-    //Validate summary
-    if(summary !== undefined) {
-        newBrand.summary = summary;
-    }
-    newBrand.logo = logo;
-    newBrand.summary = summary;
-    try{
         const result = await db.insert(brandsTable).values(newBrand).returning();
-        console.log(result);
-        return res.status(201).json({success: true, message: "Brand created successfully", data: result});
-    }catch (error) {
+        return res.status(201).json({ success: true, message: "Brand created successfully", data: result });
+    } catch (error) {
         console.error(error);
-        return res.status(500).json({success: false, message: "Internal server error"});
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
 
 export const updateBrand = async (req, res) => {
-    const { name, logo, summary, website } = req.body;
-    const updatedBrand = { };
-    if(name) {
-        updatedBrand.name = name;
+    const { id } = req.params;
+    const { name, image_url, summary, website } = req.body;
+    if (!name || !website || !image_url || !summary) {
+        return res.status(400).json({ success: false, message: "Missing required fields" });
     }
-    if(website) {
-        updatedBrand.website = website;
-    }
-    if(logo) {
-        updatedBrand.logo = logo;
-    }else{
-        updatedBrand.logo = null;
-    }
-    /*
-    if(website) {
-        if(isValidURL(website)) {
-            return res.status(400).json({success: false, message: "Invalid website url"});
-        }else{
-            updatedBrand.website = website;
+    const updatedBrand = { name, website, summary, image_url };
+    try {
+        //Check if there is new logo, if so, delete the previous one and upload the new one
+        const prevData = await db.select().from(brandsTable).where(eq(brandsTable.id, id));
+        if (image_url !== prevData[0].logo) {
+            await cloudinary.uploader.destroy(prevData[0].image_url);
+            const url = await cloudinary.uploader.upload(logo);
+            updatedBrand.image_url = url.secure_url;
         }
-    }
-    if(logo) {
-        if(isValidURL(logo)) {
-            return res.status(400).json({success: false, message: "Invalid logo url"});
-        }else{
-            updatedBrand.logo = logo;
-        }
-    }*/
-    if(summary) {
-        updatedBrand.summary = summary;
-    }else{
-        updatedBrand.summary = null;
-    }
-    try{
-        const result = await db.update(brandsTable).set(updatedBrand).where(eq(brandsTable.id, req.params.id)).returning();
-        return res.status(200).json({success: true, message: "Brand updated successfully", data: result});
-    }catch(error) {
+        //Update brand
+        const result = await db.update(brandsTable).set(updatedBrand).where(eq(brandsTable.id, id)).returning();
+        return res.status(200).json({ success: true, message: "Brand updated successfully", data: result });
+    } catch (error) {
         console.error(error);
-        return res.status(500).json({success: false, message: "Internal server error"});
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
 
 export const deleteBrand = async (req, res) => {
-    try{
-        const result = await db.delete(brandsTable).where(eq(brandsTable.id, req.params.id));
-        return res.status(200).json({success: true, message: "Brand deleted successfully"});
-    }catch(error) {
+    const { id } = req.params;
+    try {
+        const prevImage = await db.select("image_url").from(brandsTable).where(eq(brandsTable.id, id));
+        await cloudinary.uploader.destroy(prevImage[0].image_url);
+        const result = await db.delete(brandsTable).where(eq(brandsTable.id, id));
+        return res.status(200).json({ success: true, message: "Brand deleted successfully" });
+    } catch (error) {
         console.error(error);
-        return res.status(500).json({success: false, message: "Internal server error"});
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
