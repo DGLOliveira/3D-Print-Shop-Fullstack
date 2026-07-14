@@ -1,0 +1,161 @@
+//NOTE: Create a separate schema for discount seasons
+
+import { sql } from "drizzle-orm";
+import {primaryKey , integer, pgTable, boolean, varchar, decimal, timestamp, smallint, check, text, pgEnum, unique } from "drizzle-orm/pg-core";
+
+
+const timestamps = {
+    updated_at: timestamp(),
+    created_at: timestamp().defaultNow().notNull(),
+};
+
+
+//----------------------------------Categories Tables----------------------------------//
+
+
+export const primaryCategoriesTable = pgTable(
+    "accessories_categories",
+    {
+        id: integer().primaryKey().generatedAlwaysAsIdentity(),
+        name: varchar({ length: 255 }).unique().notNull(),
+        image_url: varchar({ length: 255 }),
+        ...timestamps
+    }
+)
+
+export const secondaryCategoriesTable = pgTable(
+    "accessories_categories",
+    {
+        id: integer().primaryKey().generatedAlwaysAsIdentity(),
+        primary_id: integer("primary_id").references(() => primaryCategoriesTable.id).notNull(),
+        name: varchar({ length: 255 }).unique().notNull(),
+        image_url: varchar({ length: 255 }),
+        ...timestamps
+    }
+)
+
+export const terciaryCategoriesTable = pgTable(
+    "accessories_categories",
+    {
+        id: integer().primaryKey().generatedAlwaysAsIdentity(),
+        secondary_id: integer("secondary_id").references(() => secondaryCategoriesTable.id).notNull(),
+        name: varchar({ length: 255 }).unique().notNull(),
+        image_url: varchar({ length: 255 }),
+        ...timestamps
+    }
+)
+
+
+//----------------------------------Independent Tables----------------------------------//
+
+
+export const collectionsTable = pgTable(
+    "collections",
+    {
+        id: integer().primaryKey().generatedAlwaysAsIdentity(),
+        name: varchar({ length: 255 }).unique().notNull(),
+        description: text().notNull(),
+        image_url: varchar({ length: 255 }),
+        ...timestamps
+    }
+)
+
+export const brandsTable = pgTable(
+    "brands",
+    {
+        id: integer().primaryKey().generatedAlwaysAsIdentity(),
+        name: varchar({ length: 255 }).unique().notNull(),
+        website: varchar({ length: 255 }).notNull(),
+        image_url: varchar({ length: 255 }),
+        summary: text(),
+        ...timestamps
+    }
+);
+
+
+//----------------------------------Product Tables----------------------------------//
+
+
+export const modelsTable = pgTable(
+    "models",
+    {
+        id: integer().primaryKey().generatedAlwaysAsIdentity(),
+        name: varchar({ length: 255 }).unique().notNull(),
+        brand_id: integer("brand_id").references(() => brandsTable.id).notNull(),
+        collection_id: integer("collection_id").references(() => collectionsTable.id).notNull(),
+        primary_category_id: integer("primary_category_id").references(() => primaryCategoriesTable.id).notNull(),
+        secondary_category_id: integer("secondary_category_id").references(() => secondaryCategoriesTable.id).notNull(),
+        terciary_category_id: integer("terciary_category_id").references(() => terciaryCategoriesTable.id).notNull(),
+        ...timestamps
+    }
+)
+
+export const productsTable = pgTable(
+    "model_products",
+    {
+        id: integer().primaryKey().generatedAlwaysAsIdentity(),
+        model_id: integer("model_id").references(() => modelsTable.id).notNull(),
+        name: varchar({ length: 255 }),
+        description: text(),
+        ...timestamps
+    })
+
+export const VersionsTable = pgTable(
+    "product_versions",
+    {
+        id: integer().primaryKey().generatedAlwaysAsIdentity(),
+        product_id: integer("product_id").references(() => productsTable.id).notNull(),
+        name: varchar({ length: 255 }),
+        subname: varchar({ length: 255 }),
+        price: decimal({ precision: 6, scale: 2 }).notNull(),
+        discount: smallint().notNull(),
+        stock: smallint().notNull(),
+        details: text(),
+        publish: boolean().notNull(),
+        ...timestamps
+    })
+
+export const productImagesTable = pgTable(
+    "product_images",
+    {
+        id: integer().primaryKey().generatedAlwaysAsIdentity(),
+        image_url: varchar({ length: 255 }).notNull(), //Image url is on an external service
+        ...timestamps
+    }
+)
+
+export const productDescriptionsTable = pgTable(
+    "product_descriptions",
+    {
+        id: integer().primaryKey().generatedAlwaysAsIdentity(),
+        title: varchar({ length: 255 }).notNull(),
+        description_md: text().notNull(),
+        ...timestamps
+    }
+)
+
+
+export const descriptionToVersionsTable = pgTable(
+    "description_to_versions",
+    {
+        description_id: integer("description_id").references(() => productDescriptionsTable.id).notNull(),
+        version_id: integer("version_id").references(() => VersionsTable.id).notNull(),
+        ...timestamps
+    },
+    (table) => [
+        primaryKey({columns: [table.description_id, table.version_id]})
+    ]
+)
+
+export const versionToImagesTable = pgTable(
+    "images_to_versions",
+    {
+        version_id: integer("version_id").references(() => VersionsTable.id).notNull(),
+        image_id: integer("image_id").references(() => productImagesTable.id).notNull(),
+        index: smallint().notNull(),
+        ...timestamps
+    },
+    (table) => [
+        primaryKey({columns: [table.version_id, table.image_id]})
+    ]
+)
