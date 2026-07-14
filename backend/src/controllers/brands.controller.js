@@ -27,7 +27,7 @@ export const createBrand = async (req, res) => {
             newBrand.image_url = url.secure_url;
         }
         const result = await db.insert(brandsTable).values(newBrand).returning();
-        return res.status(201).json({ success: true, message: "Brand created successfully", data: result });
+        return res.status(201).json({ success: true, message: "Brand created successfully", data: result[0] });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: "Internal server error" });
@@ -51,7 +51,7 @@ export const updateBrand = async (req, res) => {
         }
         //Update brand
         const result = await db.update(brandsTable).set(updatedBrand).where(eq(brandsTable.id, id)).returning();
-        return res.status(200).json({ success: true, message: "Brand updated successfully", data: result });
+        return res.status(200).json({ success: true, message: "Brand updated successfully", data: result[0] });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: "Internal server error" });
@@ -67,6 +67,9 @@ export const deleteBrand = async (req, res) => {
         return res.status(200).json({ success: true, message: "Brand deleted successfully" });
     } catch (error) {
         console.error(error);
+        if(error.cause.detail.includes("models")) {
+            return res.status(409).json({ success: false, message: "Cannot delete Brand with associated Products" });
+        }
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
