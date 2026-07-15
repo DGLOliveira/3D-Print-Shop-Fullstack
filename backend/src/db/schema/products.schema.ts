@@ -48,6 +48,7 @@ export const terciaryCategoriesTable = pgTable(
 //----------------------------------Independent Tables----------------------------------//
 
 
+//Example, in Samsung Galaxy S10 Pro, the collection is Galaxy
 export const collectionsTable = pgTable(
     "collections",
     {
@@ -59,6 +60,7 @@ export const collectionsTable = pgTable(
     }
 )
 
+//Example, in Samsung Galaxy S10 Pro, the brand is Samsung
 export const brandsTable = pgTable(
     "brands",
     {
@@ -74,7 +76,7 @@ export const brandsTable = pgTable(
 
 //----------------------------------Product Tables----------------------------------//
 
-
+//Example, in Samsung Galaxy S10 Pro, the model is Galaxy S10
 export const modelsTable = pgTable(
     "models",
     {
@@ -89,6 +91,7 @@ export const modelsTable = pgTable(
     }
 )
 
+//Example, in Samsung Galaxy S10 Pro, the product is Pro
 export const productsTable = pgTable(
     "model_products",
     {
@@ -97,7 +100,10 @@ export const productsTable = pgTable(
         name: varchar({ length: 255 }),
         description: text(),
         ...timestamps
-    })
+    }
+)
+
+//Example, in Samsung Galaxy S10 Pro, the Version is relative to different colors and/or capacity
 
 export const VersionsTable = pgTable(
     "product_versions",

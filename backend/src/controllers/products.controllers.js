@@ -4,6 +4,11 @@ import { db } from "../db/index.ts";
 import * as schema from "../db/schema/products.schema.ts";
 
 
+//TODO
+export const getAllProducts = async (req, res) => {
+    return res.status(501);
+}
+
 export const createModel = async (req, res) => {
     const { name, brand_id, collection_id, primary_category_id, secondary_category_id, terciary_category_id } = req.body;
     if (!name || !brand_id || !collection_id || !primary_category_id || !secondary_category_id || !terciary_category_id) {
