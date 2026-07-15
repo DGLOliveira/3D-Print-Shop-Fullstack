@@ -121,11 +121,11 @@ export const deletePrimaryCategory = async (req, res) => {
 }
 
 export const createSecondaryCategory = async (req, res) => {
-    const { name, image, primary_id } = req.body;
-    if (!name || !image || !primary_id) {
+    const { name, image, parent_id } = req.body;
+    if (!name || !image || !parent_id) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
-    const newCategory = { name, image_url: "", primary_id };
+    const newCategory = { name, image_url: "", primary_id: parent_id };
     try {
         if (image !== "") {
             const url = await cloudinary.uploader.upload(image);
@@ -187,11 +187,11 @@ export const deleteSecondaryCategory = async (req, res) => {
 }
 
 export const createTerciaryCategory = async (req, res) => {
-    const { name, image, secondary_id } = req.body;
-    if (!name || !image || !secondary_id) {
+    const { name, image, parent_id } = req.body;
+    if (!name || !image || !parent_id) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
-    const newCategory = { name, image_url: "", secondary_id };
+    const newCategory = { name, image_url: "", secondary_id: parent_id };
     try {
         if (image !== "") {
             const url = await cloudinary.uploader.upload(image);
