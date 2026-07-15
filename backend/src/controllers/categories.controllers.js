@@ -108,7 +108,7 @@ export const deletePrimaryCategory = async (req, res) => {
         const prevEntry = await db.select("image_url").from(primaryCategoriesTable).where(eq(primaryCategoriesTable.id, id));
         await cloudinary.uploader.destroy(prevEntry[0].image_url);
         await db.delete(primaryCategoriesTable).where(eq(primaryCategoriesTable.id, id));
-        return res.status(200).json({ success: true, message: "Category deleted successfully" });
+        return res.status(204);
     } catch (error) {
         if (error.cause.detail.includes("secondary_categories")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated subcategories" });
@@ -174,7 +174,7 @@ export const deleteSecondaryCategory = async (req, res) => {
         const prevEntry = await db.select("image_url").from(secondaryCategoriesTable).where(eq(secondaryCategoriesTable.id, id));
         await cloudinary.uploader.destroy(prevEntry[0].image_url);
         await db.delete(secondaryCategoriesTable).where(eq(secondaryCategoriesTable.id, id));
-        return res.status(200).json({ success: true, message: "Category deleted successfully" });
+        return res.status(204);
     } catch (error) {
         if (error.cause.detail.includes("terciary_categories")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated subcategories" });
@@ -240,7 +240,7 @@ export const deleteTerciaryCategory = async (req, res) => {
         const prevEntry = await db.select("image_url").from(terciaryCategoriesTable).where(eq(terciaryCategoriesTable.id, id));
         await cloudinary.uploader.destroy(prevEntry[0].image_url);
         await db.delete(terciaryCategoriesTable).where(eq(terciaryCategoriesTable.id, id));
-        return res.status(200).json({ success: true, message: "Category deleted successfully" });
+        return res.status(204);
     } catch (error) {
         if(error.cause.detail.includes("models")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated products" });

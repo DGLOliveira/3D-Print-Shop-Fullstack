@@ -149,8 +149,8 @@ export const descriptionToVersionsTable = pgTable(
     ]
 )
 
-export const versionToImagesTable = pgTable(
-    "images_to_versions",
+export const imageToVersionsTable = pgTable(
+    "image_to_versions",
     {
         version_id: integer("version_id").references(() => VersionsTable.id).notNull(),
         image_id: integer("image_id").references(() => productImagesTable.id).notNull(),
