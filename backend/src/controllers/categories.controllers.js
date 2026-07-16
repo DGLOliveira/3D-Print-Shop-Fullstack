@@ -1,12 +1,12 @@
-
+import { eq, lt, gte, ne } from 'drizzle-orm';
 import cloudinary from "../lib/cloudinary.lib.js";
 import { db } from "../db/index.ts";
 import { primaryCategoriesTable, secondaryCategoriesTable, terciaryCategoriesTable } from "../db/schema/products.schema.ts";
 
 // Function to format the categories data into a compressed nested structure for frontend use
 function formatCategories(categories) {
-    const formattedCategories = {};
-    result.forEach((category) => {
+    const formattedResult = {};
+    categories.forEach((category) => {
         if (!formattedResult[category.primary_categories.name]) {
             formattedResult[category.primary_categories.id] = {
                 name: category.primary_categories.id,
@@ -40,12 +40,13 @@ function formatCategories(categories) {
         }
 
     })
-    return formattedCategories;
+    return formattedResult;
 }
 
 export const getAllCategories = async (req, res) => {
     try {
         const result = await db.select().from(primaryCategoriesTable).leftJoin(secondaryCategoriesTable, eq(primaryCategoriesTable.id, secondaryCategoriesTable.primary_category_id)).leftJoin(terciaryCategoriesTable, eq(secondaryCategoriesTable.id, terciaryCategoriesTable.secondary_category_id));
+        console.log(result)
         const formattedCategories = formatCategories(result);
         return res.status(200).json({ success: true, data: formattedCategories });
     } catch (error) {

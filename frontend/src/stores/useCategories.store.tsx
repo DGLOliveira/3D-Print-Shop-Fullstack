@@ -50,6 +50,10 @@ interface CategoriesState {
     selectedTerciaryCategory: number | null;
     categories: Categories;
 
+    setPrimaryCategory: (id: number) => void;
+    setSecondaryCategory: (id: number) => void;
+    setTerciaryCategory: (id: number) => void;
+
     fetchCategories: () => Promise<void>;
 
     createPrimaryCategory: (categoryForm: CategoryForm, dialog: HTMLDialogElement) => Promise<void>;
@@ -77,6 +81,10 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
     selectedSecondaryCategory: null,
     selectedTerciaryCategory: null,
     categories: {},
+
+    setPrimaryCategory: (id) => set({ selectedPrimaryCategory: id, selectedSecondaryCategory: null, selectedTerciaryCategory: null }),
+    setSecondaryCategory: (id) => set({ selectedSecondaryCategory: id, selectedTerciaryCategory: null }),
+    setTerciaryCategory: (id) => set({ selectedTerciaryCategory: id }),
 
     fetchCategories: async () => {
         try {
