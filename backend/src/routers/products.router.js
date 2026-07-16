@@ -5,7 +5,7 @@ import * as products from "../controllers/products.controllers.js";
 const router = Router();
 
 
-router.get("/", products.getAllProducts);
+router.get("/all/", products.getAllProducts);
 
 router.post("/model/", products.createModel);
 router.put("/model/:id", products.updateModel);

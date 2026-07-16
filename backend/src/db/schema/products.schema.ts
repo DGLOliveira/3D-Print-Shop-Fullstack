@@ -111,7 +111,7 @@ export const VersionsTable = pgTable(
         id: integer().primaryKey().generatedAlwaysAsIdentity(),
         product_id: integer("product_id").references(() => productsTable.id).notNull(),
         name: varchar({ length: 255 }),
-        subname: varchar({ length: 255 }),
+        subtitle: varchar({ length: 255 }),
         price: decimal({ precision: 6, scale: 2 }).notNull(),
         discount: smallint().notNull(),
         stock: smallint().notNull(),
