@@ -36,7 +36,7 @@ const Navbar = () => {
                     <ul className="menu md:menu-horizontal w-full lg:min-w-max justify-around px-8">
                         <li>
                             <Link to="store" className={location.pathname.slice(0, 6) === "/store" ? "text-primary text-lg" : "text-lg"}>
-                                Products
+                                Store
                             </Link>
                             <ul>
                                 <li>

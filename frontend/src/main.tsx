@@ -35,6 +35,7 @@ import Terms from './Pages/Help Pages/Terms.page.tsx'
 import Store from './Pages/Product Pages/Store.page.tsx'
 import Product from './Pages/Product Pages/Product.page.tsx'
 import AddProduct from './Pages/Product Pages/AddProduct.page.tsx'
+import EditProduct from './Pages/Product Pages/EditProduct.page.tsx'
 
 //Service Pages
 import Service from './Pages/Service Pages/Service.page.tsx'
@@ -56,6 +57,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="store" element={<Store />} >
             <Route path=":id" element={<Product />} />
             <Route path="add-product" element={<AddProduct />} />
+            <Route path="edit-product" element={<EditProduct />} />
           </Route>
           <Route path="services" element={<Service />} >
             <Route path="scanning-and-digital" element={<ScanningAndDigitalization />} />
@@ -77,10 +79,10 @@ createRoot(document.getElementById('root')!).render(
           </Route>
           <Route path="account" element={<Account />} >
             <Route path="login" element={<Login />} />
-            <Route path="admin" element={<Admin />} />
             <Route path="cart" element={<Cart />} />
             <Route path="checkout" element={<CheckOut />} />
           </Route>
+          <Route path="admin" element={<Admin />} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>
