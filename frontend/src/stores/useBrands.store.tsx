@@ -6,7 +6,7 @@ import handleErrorMessage from "../utils/handleErrorMessage.util.tsx";
 export interface BrandForm {
     name: string;
     website: string;
-    logo: string;
+    logo: string | ArrayBuffer | null;
     summary: string;
 }
 
@@ -14,7 +14,7 @@ export interface Brand {
     id: number;
     name: string;
     website: string;
-    logo: string;
+    image_url: string;
     summary: string;
 }
 
@@ -27,10 +27,10 @@ interface BrandsState {
     isUpdating: boolean;
     brands: [] | BrandsArray;
     selectedBrand: number | null;
-    selectBrand: (index: number) => void;
+    selectBrand: (index: number | null) => void;
     fetchBrands: () => Promise<void>;
-    createBrand: (brandForm: BrandForm, dialog: HTMLDialogElement) => Promise<void>;
-    updateBrand: (id: number, brandForm: BrandForm, dialog: HTMLDialogElement) => Promise<void>;
+    createBrand: (brandForm: BrandForm) => Promise<void>;
+    updateBrand: (id: number, brandForm: BrandForm) => Promise<void>;
     deleteBrand: (id: number) => Promise<void>;
 }
 
@@ -58,13 +58,12 @@ export const useBrandsStore = create<BrandsState>((set, get) => ({
         }
     },
 
-    createBrand: async (brandForm, dialog) => {
+    createBrand: async (brandForm) => {
         try {
             set({ isCreating: true });
             const res = await axiosInstance.post("/brands", brandForm);
             set((state) => ({ brands: [...state.brands, res.data.data[0]] }));
             toast.success("Brand created successfully");
-            dialog.close();
         } catch (error) {
             handleErrorMessage(error, "createBrand");
         } finally {
@@ -73,13 +72,12 @@ export const useBrandsStore = create<BrandsState>((set, get) => ({
         }
     },
 
-    updateBrand: async (id, brandForm, dialog) => {
+    updateBrand: async (id, brandForm) => {
         try {
             set({ isUpdating: true });
             const res = await axiosInstance.put("/brands/" + id, brandForm);
             set((state) => ({ brands: state.brands.map((brand) => brand.id === id ? res.data.data[0] : brand) }));
             toast.success("Brand updated successfully");
-            dialog.close();
         } catch (error) {
             handleErrorMessage(error, "updateBrand");
         } finally {

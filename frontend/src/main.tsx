@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router'
-import {Toaster} from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 import './index.css'
 
 import App from './App.tsx'
@@ -13,7 +13,10 @@ import Account from './Pages/Account Pages/Account.page.tsx'
 import Cart from './Pages/Account Pages/Cart.page.tsx'
 import CheckOut from './Pages/Account Pages/CheckOut.page.tsx'
 import Login from './Pages/Account Pages/Login.page.tsx'
-import Admin from './Pages/Account Pages/Admin.page.tsx'
+
+//Admin Pages
+import Admin from './Pages/Admin Pages/Admin.page.tsx'
+import ManageBrands from './Pages/Admin Pages/ManageBrands.page.tsx'
 
 //Company Pages
 import Company from './Pages/Company Pages/Company.page.tsx'
@@ -82,7 +85,9 @@ createRoot(document.getElementById('root')!).render(
             <Route path="cart" element={<Cart />} />
             <Route path="checkout" element={<CheckOut />} />
           </Route>
-          <Route path="admin" element={<Admin />} />
+          <Route path="admin" element={<Admin />} >
+            <Route path="manage-brands" element={<ManageBrands />} />
+          </Route>
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>
