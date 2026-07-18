@@ -148,7 +148,7 @@ export const createVersionImage = async (req, res) => {
     }
     try {
         const url = await cloudinary.uploader.upload(image);
-        const imageEntry = await db.insert(schema.versionImagesTable).values({ image_url: url.secure_url }).returning();
+        const imageEntry = await db.insert(schema.versionImagesTable).values({ image_url: url.secure_url, image_public_id: url.public_id }).returning();
         const result = await db.insert(schema.versionsImagesTable).values({ version_id, image_id: imageEntry[0].id, index }).returning();
         return res.status(201).json({ success: true, data: url.secure_url });
     } catch (error) {
@@ -180,8 +180,8 @@ export const deleteVersionImage = async (req, res) => {
         //If it is used only in this version, delete the image from cloudinary
         if (countRelations.count === 0) {
             //fetch the image url and delete from cloudinary
-            const image = await db.select("image_url").from(schema.versionImagesTable).where(schema.versionImagesTable.id.eq(id));
-            await cloudinary.uploader.destroy(image[0].image_url);
+            const image = await db.select().from(schema.versionImagesTable).where(schema.versionImagesTable.id.eq(id));
+            await cloudinary.uploader.destroy(image[0].image_public_id);
             await db.delete(schema.versionImagesTable).where(schema.versionImagesTable.id.eq(id));
         }
         return res.status(204);

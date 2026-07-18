@@ -60,14 +60,15 @@ export const createPrimaryCategory = async (req, res) => {
     if (!name || !image) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
-    const newCategory = { name, image_url: "" };
+    const newCategory = { name, image_url: "", image_public_id: "" };
     try {
         if (image !== "") {
             const url = await cloudinary.uploader.upload(image);
             newCategory.image_url = url.secure_url;
+            newCategory.image_public_id = url.public_id;
         }
         const result = await db.insert(primaryCategoriesTable).values(newCategory).returning();
-        return res.status(201).json({ success: true, data: result[0] });
+        return res.status(201).json({ success: true, data: { id: result[0].id, name: result[0].name, image_url: result[0].image_url } });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: "Internal server error" });
@@ -80,23 +81,28 @@ export const updatePrimaryCategory = async (req, res) => {
     if (!name || !image_url) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
-    const updatedCategory = { name, image_url: "" };
+    const updatedCategory = { name, image_url: "", image_public_id: "" };
     try {
         //Get previous data
         const prevData = await db.select().from(primaryCategoriesTable).where(eq(primaryCategoriesTable.id, id));
         //Check if there is a new image sent, if so, delete the previous one
         if (image_url !== prevData[0].image_url) {
-            await cloudinary.uploader.destroy(prevData[0].image_url);
+            await cloudinary.uploader.destroy(prevData[0].image_public_id);
             //Upload new image if any
             if (image_url === "") {
                 updatedCategory.image_url = "";
+                updatedCategory.image_public_id = "";
             } else {
                 const url = await cloudinary.uploader.upload(image_url);
                 updatedCategory.image_url = url.secure_url;
+                updatedCategory.image_public_id = url.public_id;
             }
+        }else{
+            updatedCategory.image_url = prevData[0].image_url;
+            updatedCategory.image_public_id = prevData[0].image_public_id;
         }
         const result = await db.update(primaryCategoriesTable).set(updatedCategory).where(eq(primaryCategoriesTable.id, id)).returning();
-        return res.status(200).json({ success: true, data: result[0] });
+        return res.status(200).json({ success: true, data: { id: result[0].id, name: result[0].name, image_url: result[0].image_url } });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: "Internal server error" });
@@ -106,8 +112,8 @@ export const updatePrimaryCategory = async (req, res) => {
 export const deletePrimaryCategory = async (req, res) => {
     const { id } = req.params;
     try {
-        const prevEntry = await db.select("image_url").from(primaryCategoriesTable).where(eq(primaryCategoriesTable.id, id));
-        await cloudinary.uploader.destroy(prevEntry[0].image_url);
+        const prevEntry = await db.select().from(primaryCategoriesTable).where(eq(primaryCategoriesTable.id, id));
+        await cloudinary.uploader.destroy(prevEntry[0].image_public_id);
         await db.delete(primaryCategoriesTable).where(eq(primaryCategoriesTable.id, id));
         return res.status(204);
     } catch (error) {
@@ -126,14 +132,15 @@ export const createSecondaryCategory = async (req, res) => {
     if (!name || !image || !parent_id) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
-    const newCategory = { name, image_url: "", primary_id: parent_id };
+    const newCategory = { name, image_url: "", image_public_id: "", primary_id: parent_id };
     try {
         if (image !== "") {
             const url = await cloudinary.uploader.upload(image);
             newCategory.image_url = url.secure_url;
+            newCategory.image_public_id = url.public_id;
         }
         const result = await db.insert(secondaryCategoriesTable).values(newCategory).returning();
-        return res.status(201).json({ success: true, data: result[0] });
+        return res.status(201).json({ success: true, data: { id: result[0].id, name: result[0].name, image_url: result[0].image_url, primary_id: result[0].primary_id } });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: "Internal server error" });
@@ -152,17 +159,22 @@ export const updateSecondaryCategory = async (req, res) => {
         const prevData = await db.select().from(secondaryCategoriesTable).where(eq(secondaryCategoriesTable.id, id));
         //Check if there is a new image sent, if so, delete the previous one
         if (image_url !== prevData[0].image_url) {
-            await cloudinary.uploader.destroy(prevData[0].image_url);
+            await cloudinary.uploader.destroy(prevData[0].image_public_id);
             //Upload new image if any
             if (image_url === "") {
                 updatedCategory.image_url = "";
+                updatedCategory.image_public_id = "";
             } else {
                 const url = await cloudinary.uploader.upload(image_url);
                 updatedCategory.image_url = url.secure_url;
+                updatedCategory.image_public_id = url.public_id;
             }
+        }else{
+            updatedCategory.image_url = prevData[0].image_url;
+            updatedCategory.image_public_id = prevData[0].image_public_id;
         }
         const result = await db.update(secondaryCategoriesTable).set(updatedCategory).where(eq(secondaryCategoriesTable.id, id)).returning();
-        return res.status(200).json({ success: true, data: result[0] });
+        return res.status(200).json({ success: true, data: { id: result[0].id, name: result[0].name, image_url: result[0].image_url, primary_id: result[0].primary_id } });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: "Internal server error" });
@@ -172,8 +184,8 @@ export const updateSecondaryCategory = async (req, res) => {
 export const deleteSecondaryCategory = async (req, res) => {
     const { id } = req.params;
     try {
-        const prevEntry = await db.select("image_url").from(secondaryCategoriesTable).where(eq(secondaryCategoriesTable.id, id));
-        await cloudinary.uploader.destroy(prevEntry[0].image_url);
+        const prevEntry = await db.select().from(secondaryCategoriesTable).where(eq(secondaryCategoriesTable.id, id));
+        await cloudinary.uploader.destroy(prevEntry[0].image_public_id);
         await db.delete(secondaryCategoriesTable).where(eq(secondaryCategoriesTable.id, id));
         return res.status(204);
     } catch (error) {
@@ -192,14 +204,15 @@ export const createTerciaryCategory = async (req, res) => {
     if (!name || !image || !parent_id) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
-    const newCategory = { name, image_url: "", secondary_id: parent_id };
+    const newCategory = { name, image_url: "", image_public_id: "", secondary_id: parent_id };
     try {
         if (image !== "") {
             const url = await cloudinary.uploader.upload(image);
             newCategory.image_url = url.secure_url;
+            newCategory.image_public_id = url.public_id;
         }
         const result = await db.insert(terciaryCategoriesTable).values(newCategory).returning();
-        return res.status(201).json({ success: true, data: result[0] });
+        return res.status(201).json({ success: true, data: { id: result[0].id, name: result[0].name, image_url: result[0].image_url, secondary_id: result[0].secondary_id } });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: "Internal server error" });
@@ -208,11 +221,11 @@ export const createTerciaryCategory = async (req, res) => {
 
 export const updateTerciaryCategory = async (req, res) => {
     const { id } = req.params;
-    const { name, image_url } = req.body;
+    const { name, image_url, secondary_id } = req.body;
     if (!name || !image_url) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
-    const updatedCategory = { name, image_url: "" };
+    const updatedCategory = { name, image_url: "", image_public_id: "", secondary_id };
     try {
         //Get previous data
         const prevData = await db.select().from(terciaryCategoriesTable).where(eq(terciaryCategoriesTable.id, id));
@@ -222,13 +235,18 @@ export const updateTerciaryCategory = async (req, res) => {
             //Upload new image if any
             if (image_url === "") {
                 updatedCategory.image_url = "";
+                updatedCategory.image_public_id = "";
             } else {
                 const url = await cloudinary.uploader.upload(image_url);
                 updatedCategory.image_url = url.secure_url;
+                updatedCategory.image_public_id = url.public_id;
             }
+        }else{
+            updatedCategory.image_url = prevData[0].image_url;
+            updatedCategory.image_public_id = prevData[0].image_public_id;
         }
         const result = await db.update(terciaryCategoriesTable).set(updatedCategory).where(eq(terciaryCategoriesTable.id, id)).returning();
-        return res.status(200).json({ success: true, data: result[0] });
+        return res.status(200).json({ success: true, data: { id: result[0].id, name: result[0].name, image_url: result[0].image_url, secondary_id: result[0].secondary_id } });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: "Internal server error" });
@@ -238,8 +256,8 @@ export const updateTerciaryCategory = async (req, res) => {
 export const deleteTerciaryCategory = async (req, res) => {
     const { id } = req.params;
     try {
-        const prevEntry = await db.select("image_url").from(terciaryCategoriesTable).where(eq(terciaryCategoriesTable.id, id));
-        await cloudinary.uploader.destroy(prevEntry[0].image_url);
+        const prevEntry = await db.select().from(terciaryCategoriesTable).where(eq(terciaryCategoriesTable.id, id));
+        await cloudinary.uploader.destroy(prevEntry[0].image_public_id);
         await db.delete(terciaryCategoriesTable).where(eq(terciaryCategoriesTable.id, id));
         return res.status(204);
     } catch (error) {

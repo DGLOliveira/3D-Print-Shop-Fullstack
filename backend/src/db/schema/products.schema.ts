@@ -18,6 +18,7 @@ export const primaryCategoriesTable = pgTable(
         id: integer().primaryKey().generatedAlwaysAsIdentity(),
         name: varchar({ length: 255 }).unique().notNull(),
         image_url: varchar({ length: 255 }),
+        image_public_id: varchar({ length: 255 }),
         ...timestamps
     }
 )
@@ -29,6 +30,7 @@ export const secondaryCategoriesTable = pgTable(
         primary_id: integer("primary_id").references(() => primaryCategoriesTable.id).notNull(),
         name: varchar({ length: 255 }).unique().notNull(),
         image_url: varchar({ length: 255 }),
+        image_public_id: varchar({ length: 255 }),
         ...timestamps
     }
 )
@@ -40,6 +42,7 @@ export const terciaryCategoriesTable = pgTable(
         secondary_id: integer("secondary_id").references(() => secondaryCategoriesTable.id).notNull(),
         name: varchar({ length: 255 }).unique().notNull(),
         image_url: varchar({ length: 255 }),
+        image_public_id: varchar({ length: 255 }),
         ...timestamps
     }
 )
@@ -56,6 +59,7 @@ export const collectionsTable = pgTable(
         name: varchar({ length: 255 }).unique().notNull(),
         description: text().notNull(),
         image_url: varchar({ length: 255 }),
+        image_public_id: varchar({ length: 255 }),
         ...timestamps
     }
 )
@@ -68,6 +72,7 @@ export const brandsTable = pgTable(
         name: varchar({ length: 255 }).unique().notNull(),
         website: varchar({ length: 255 }).notNull(),
         image_url: varchar({ length: 255 }),
+        image_public_id: varchar({ length: 255 }),
         summary: text(),
         ...timestamps
     }
@@ -124,7 +129,8 @@ export const productImagesTable = pgTable(
     "product_images",
     {
         id: integer().primaryKey().generatedAlwaysAsIdentity(),
-        image_url: varchar({ length: 255 }).notNull(), //Image url is on an external service
+        image_url: varchar({ length: 255 }).notNull(),
+        image_public_id: varchar({ length: 255 }), 
         ...timestamps
     }
 )
