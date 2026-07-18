@@ -24,6 +24,7 @@ export const getAllBrands = async (req, res) => {
     try {
         const result = await db.select().from(brandsTable);
         const formattedBrands = result.map((brand) => formatData([brand]));
+        console.log(formattedBrands)
         return res.status(200).json({ success: true, data: formattedBrands });
     } catch (error) {
         console.log(error);
@@ -55,15 +56,15 @@ export const createBrand = async (req, res) => {
 
 export const updateBrand = async (req, res) => {
     const { id } = req.params;
-    const { name, image_url, summary, website } = req.body;
-    if (!name || !website || !image_url || !summary) {
+    const { name, logo, summary, website } = req.body;
+    if (!name || !website || !logo || !summary) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
-    const updatedBrand = { name, website, summary, image_url };
+    const updatedBrand = { name, website, summary, image_url: logo };
     try {
         //Check if there is new logo, if so, delete the previous one and upload the new one
         const prevData = await db.select().from(brandsTable).where(eq(brandsTable.id, id));
-        if (image_url !== prevData[0].logo) {
+        if (logo !== prevData[0].image_url) {
             await cloudinary.uploader.destroy(prevData[0].public_id);
             const url = await cloudinary.uploader.upload(logo, UPLOADER_OPTIONS);
             updatedBrand.image_url = url.secure_url;
@@ -85,9 +86,8 @@ export const deleteBrand = async (req, res) => {
         const prevEntry = await db.select().from(brandsTable).where(eq(brandsTable.id, id));
         await cloudinary.uploader.destroy(prevEntry[0].image_public_id);
         const result = await db.delete(brandsTable).where(eq(brandsTable.id, id));
-        return res.status(204);
+        return res.sendStatus(204);
     } catch (error) {
-        console.log(error)
         if (error.cause) {
             if (error.cause.detail.includes("models")) {
                 return res.status(409).json({ success: false, message: "Cannot delete Brand with associated Products" });

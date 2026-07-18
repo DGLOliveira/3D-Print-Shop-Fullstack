@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { Toaster } from 'react-hot-toast'
@@ -51,7 +50,7 @@ import ScanningAndDigitalization from './Pages/Service Pages/ScanningAndDigitali
 
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  <>
     <Toaster />
     <BrowserRouter>
       <Routes>
@@ -92,5 +91,5 @@ createRoot(document.getElementById('root')!).render(
         </Route>
       </Routes>
     </BrowserRouter>
-  </StrictMode>,
+  </>,
 )
