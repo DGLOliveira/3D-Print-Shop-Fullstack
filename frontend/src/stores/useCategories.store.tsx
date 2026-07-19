@@ -32,19 +32,20 @@ interface Categories {
     [id: number]: PrimaryCategory;
 }
 
-interface CategoryForm {
+export interface CategoryForm {
     name: string;
-    image_url: string;
+    image: string | ArrayBuffer | null;
 }
 
-interface SubCategoryForm {
+export interface SubCategoryForm {
     name: string;
-    image_url: string;
+    image: string | ArrayBuffer | null;
     parent_id: number;
 }
 
 interface CategoriesState {
     isUpdating: boolean;
+    isDeleting: boolean;
     selectedPrimaryCategory: number | null;
     selectedSecondaryCategory: number | null;
     selectedTerciaryCategory: number | null;
@@ -56,16 +57,16 @@ interface CategoriesState {
 
     fetchCategories: () => Promise<void>;
 
-    createPrimaryCategory: (categoryForm: CategoryForm, dialog: HTMLDialogElement) => Promise<void>;
-    updatePrimaryCategory: (id: number, categoryForm: CategoryForm, dialog: HTMLDialogElement) => Promise<void>;
+    createPrimaryCategory: (categoryForm: CategoryForm) => Promise<void>;
+    updatePrimaryCategory: (id: number, categoryForm: CategoryForm) => Promise<void>;
     deletePrimaryCategory: (id: number) => Promise<void>;
     
-    createSecondaryCategory: (categoryForm: SubCategoryForm, dialog: HTMLDialogElement) => Promise<void>;
-    updateSecondaryCategory: (id: number, categoryForm: SubCategoryForm, dialog: HTMLDialogElement) => Promise<void>;
+    createSecondaryCategory: (categoryForm: SubCategoryForm) => Promise<void>;
+    updateSecondaryCategory: (id: number, categoryForm: SubCategoryForm) => Promise<void>;
     deleteSecondaryCategory: (id: number) => Promise<void>;
 
-    createTerciaryCategory: (categoryForm: SubCategoryForm, dialog: HTMLDialogElement) => Promise<void>;
-    updateTerciaryCategory: (id: number, categoryForm: SubCategoryForm, dialog: HTMLDialogElement) => Promise<void>;
+    createTerciaryCategory: (categoryForm: SubCategoryForm) => Promise<void>;
+    updateTerciaryCategory: (id: number, categoryForm: SubCategoryForm) => Promise<void>;
     deleteTerciaryCategory: (id: number) => Promise<void>;
 
 }
@@ -77,6 +78,7 @@ const TERCIARY_CATEGORY_URL = `${CATEGORY_URL}/terciary`;
 
 export const useCategoriesStore = create<CategoriesState>((set, get) => ({
     isUpdating: false,
+    isDeleting: false,
     selectedPrimaryCategory: null,
     selectedSecondaryCategory: null,
     selectedTerciaryCategory: null,
@@ -95,13 +97,12 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
         }
     },
 
-    createPrimaryCategory: async (categoryForm, dialog) => {
+    createPrimaryCategory: async (categoryForm) => {
         try {
             set({ isUpdating: true });
             const res = await axiosInstance.post(PRIMARY_CATEGORY_URL, categoryForm);
             set((state) => ({ categories: { ...state.categories, [res.data.data.id]: {name: res.data.data.name, image_url: res.data.data.image_url, subCategories: {} }}}));
             toast.success("Primary category created successfully");
-            dialog.close();
         } catch (error) {
             handleErrorMessage(error, "createCategory");
         } finally {
@@ -109,13 +110,12 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
         }
     },
 
-    updatePrimaryCategory: async (id, categoryForm, dialog) => {
+    updatePrimaryCategory: async (id, categoryForm) => {
         try {
             set({ isUpdating: true });
             const res = await axiosInstance.put(`${PRIMARY_CATEGORY_URL}/${id}`, categoryForm);
             set((state) => ({ categories: { ...state.categories, [id]: {name: res.data.data.name, image_url: res.data.data.image_url, subCategories: {...state.categories[id].subCategories} }}}));
             toast.success("Primary category updated successfully");
-            dialog.close();
         } catch (error) {
             handleErrorMessage(error, "updateCategory");
         } finally {
@@ -125,7 +125,7 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
 
     deletePrimaryCategory: async (id) => {
         try {
-            set({ isUpdating: true });
+            set({ isDeleting: true });
             await axiosInstance.delete(`${PRIMARY_CATEGORY_URL}/${id}`);
             let newCategories = get().categories;
             delete newCategories[id];
@@ -134,11 +134,11 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
         } catch (error) {
             handleErrorMessage(error, "deleteCategory");
         } finally {
-            set({ isUpdating: false });
+            set({ isDeleting: false });
         }
     },
 
-    createSecondaryCategory: async (subCategoryForm, dialog) => {
+    createSecondaryCategory: async (subCategoryForm) => {
         try {
             set({ isUpdating: true });
             const res = await axiosInstance.post(SECONDARY_CATEGORY_URL, subCategoryForm);
@@ -146,7 +146,6 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
             newCategories[res.data.data.parent_id].subCategories[res.data.data.id] = {name: res.data.data.name, image_url: res.data.data.image_url, subcategories: {} };
             set({ categories: newCategories });
             toast.success("Secondary category created successfully");
-            dialog.close();
         } catch (error) {
             handleErrorMessage(error, "createCategory");
         } finally {
@@ -154,7 +153,7 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
         }
     },
 
-    updateSecondaryCategory: async (id, subCategoryForm, dialog) => {
+    updateSecondaryCategory: async (id, subCategoryForm) => {
         try {
             set({ isUpdating: true });
             const res = await axiosInstance.put(`${SECONDARY_CATEGORY_URL}/${id}`, subCategoryForm);
@@ -162,7 +161,6 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
             newCategories[res.data.data.parent_id].subCategories[id] = {name: res.data.data.name, image_url: res.data.data.image_url, subcategories: {...newCategories[res.data.data.parent_id].subCategories[id].subcategories} };
             set({ categories: newCategories });
             toast.success("Secondary category updated successfully");
-            dialog.close();
         } catch (error) {
             handleErrorMessage(error, "updateCategory");
         } finally {
@@ -172,7 +170,7 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
 
     deleteSecondaryCategory: async (id) => {
         try {
-            set({ isUpdating: true });
+            set({ isDeleting: true });
             await axiosInstance.delete(`${SECONDARY_CATEGORY_URL}/${id}`);
             let newCategories = get().categories;
             delete newCategories[id];
@@ -181,11 +179,11 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
         } catch (error) {
             handleErrorMessage(error, "deleteCategory");
         } finally {
-            set({ isUpdating: false });
+            set({ isDeleting: false });
         }
     },
 
-    createTerciaryCategory: async (subCategoryForm, dialog) => {
+    createTerciaryCategory: async (subCategoryForm) => {
         try {
             set({ isUpdating: true });
             const res = await axiosInstance.post(TERCIARY_CATEGORY_URL, subCategoryForm);
@@ -199,7 +197,6 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
             }
             set({ categories: newCategories });
             toast.success("Terciary category created successfully");
-            dialog.close();
         } catch (error) {
             handleErrorMessage(error, "createCategory");
         } finally {
@@ -207,7 +204,7 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
         }
     },
 
-    updateTerciaryCategory: async (id, subCategoryForm, dialog) => {
+    updateTerciaryCategory: async (id, subCategoryForm) => {
         try {
             set({ isUpdating: true });
             const res = await axiosInstance.put(`${TERCIARY_CATEGORY_URL}/${id}`, subCategoryForm);
@@ -218,7 +215,6 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
             }
             set({ categories: newCategories });
             toast.success("Terciary category updated successfully");
-            dialog.close();
         } catch (error) {
             handleErrorMessage(error, "updateCategory");
         } finally {
@@ -228,7 +224,7 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
 
     deleteTerciaryCategory: async (id) => {
         try {
-            set({ isUpdating: true });
+            set({ isDeleting: true });
             await axiosInstance.delete(`${TERCIARY_CATEGORY_URL}/${id}`);
             let newCategories = get().categories;
             const selectedPrimaryCategory = get().selectedPrimaryCategory;
@@ -240,7 +236,7 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
         } catch (error) {
             handleErrorMessage(error, "deleteCategory");
         } finally {
-            set({ isUpdating: false });
+            set({ isDeleting: false });
         }
     },
 

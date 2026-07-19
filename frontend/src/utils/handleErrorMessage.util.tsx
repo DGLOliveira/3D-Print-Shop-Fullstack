@@ -20,7 +20,6 @@ export default function handleErrorMessage(error: unknown, location: string) {
             response.data !== null &&
             "message" in response.data
         ) {
-            console.log("response data", response.data);
             message = String((response.data as { message?: unknown }).message);
         } else if (error instanceof Error) {
             message = instanceOfError(error);

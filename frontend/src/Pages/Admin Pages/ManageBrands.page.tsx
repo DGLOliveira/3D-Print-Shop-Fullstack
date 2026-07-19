@@ -205,7 +205,7 @@ export const ManageBrands = () => {
         return (
             <>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                    <h1 className="text-2xl font-bold text-center">Add Brand</h1>
+                    <h1 className="text-2xl font-bold text-center">Edit Brand</h1>
                     <div className="flex flex-col gap-2 w-full">
                         <div className="flex justify-center w-full m-1">
                             <figure className="w-40 h-40 border" onClick={() => handleImageUpload(changeImage)}>

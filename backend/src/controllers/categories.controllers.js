@@ -7,9 +7,9 @@ import { primaryCategoriesTable, secondaryCategoriesTable, terciaryCategoriesTab
 function formatCategories(categories) {
     const formattedResult = {};
     categories.forEach((category) => {
-        if (!formattedResult[category.primary_categories.name]) {
+        if (!formattedResult[category.primary_categories.id]) {
             formattedResult[category.primary_categories.id] = {
-                name: category.primary_categories.id,
+                name: category.primary_categories.name,
                 image_url: category.primary_categories.image_url,
                 subcategories: {},
             }
@@ -77,8 +77,8 @@ export const createPrimaryCategory = async (req, res) => {
 
 export const updatePrimaryCategory = async (req, res) => {
     const { id } = req.params;
-    const { name, image_url } = req.body;
-    if (!name || !image_url) {
+    const { name, image } = req.body;
+    if (!name || !image) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
     const updatedCategory = { name, image_url: "", image_public_id: "" };
@@ -86,10 +86,10 @@ export const updatePrimaryCategory = async (req, res) => {
         //Get previous data
         const prevData = await db.select().from(primaryCategoriesTable).where(eq(primaryCategoriesTable.id, id));
         //Check if there is a new image sent, if so, delete the previous one
-        if (image_url !== prevData[0].image_url) {
+        if (image !== prevData[0].image_url) {
             await cloudinary.uploader.destroy(prevData[0].image_public_id);
             //Upload new image if any
-            if (image_url === "") {
+            if (image === "") {
                 updatedCategory.image_url = "";
                 updatedCategory.image_public_id = "";
             } else {
@@ -115,7 +115,7 @@ export const deletePrimaryCategory = async (req, res) => {
         const prevEntry = await db.select().from(primaryCategoriesTable).where(eq(primaryCategoriesTable.id, id));
         await cloudinary.uploader.destroy(prevEntry[0].image_public_id);
         await db.delete(primaryCategoriesTable).where(eq(primaryCategoriesTable.id, id));
-        return res.status(204);
+        return res.sendStatus(204);
     } catch (error) {
         if (error.cause.detail.includes("secondary_categories")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated subcategories" });
@@ -149,8 +149,8 @@ export const createSecondaryCategory = async (req, res) => {
 
 export const updateSecondaryCategory = async (req, res) => {
     const { id } = req.params;
-    const { name, image_url } = req.body;
-    if (!name || !image_url) {
+    const { name, image } = req.body;
+    if (!name || !image) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
     const updatedCategory = { name, image_url: "" };
@@ -158,10 +158,10 @@ export const updateSecondaryCategory = async (req, res) => {
         //Get previous data
         const prevData = await db.select().from(secondaryCategoriesTable).where(eq(secondaryCategoriesTable.id, id));
         //Check if there is a new image sent, if so, delete the previous one
-        if (image_url !== prevData[0].image_url) {
+        if (image !== prevData[0].image_url) {
             await cloudinary.uploader.destroy(prevData[0].image_public_id);
             //Upload new image if any
-            if (image_url === "") {
+            if (image === "") {
                 updatedCategory.image_url = "";
                 updatedCategory.image_public_id = "";
             } else {
@@ -187,7 +187,7 @@ export const deleteSecondaryCategory = async (req, res) => {
         const prevEntry = await db.select().from(secondaryCategoriesTable).where(eq(secondaryCategoriesTable.id, id));
         await cloudinary.uploader.destroy(prevEntry[0].image_public_id);
         await db.delete(secondaryCategoriesTable).where(eq(secondaryCategoriesTable.id, id));
-        return res.status(204);
+        return res.sendStatus(204);
     } catch (error) {
         if (error.cause.detail.includes("terciary_categories")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated subcategories" });
@@ -221,8 +221,8 @@ export const createTerciaryCategory = async (req, res) => {
 
 export const updateTerciaryCategory = async (req, res) => {
     const { id } = req.params;
-    const { name, image_url, secondary_id } = req.body;
-    if (!name || !image_url) {
+    const { name, image, secondary_id } = req.body;
+    if (!name || !image) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
     const updatedCategory = { name, image_url: "", image_public_id: "", secondary_id };
@@ -230,10 +230,10 @@ export const updateTerciaryCategory = async (req, res) => {
         //Get previous data
         const prevData = await db.select().from(terciaryCategoriesTable).where(eq(terciaryCategoriesTable.id, id));
         //Check if there is a new image sent, if so, delete the previous one
-        if (image_url !== prevData[0].image_url) {
+        if (image !== prevData[0].image_url) {
             await cloudinary.uploader.destroy(prevData[0].image_url);
             //Upload new image if any
-            if (image_url === "") {
+            if (image === "") {
                 updatedCategory.image_url = "";
                 updatedCategory.image_public_id = "";
             } else {
@@ -259,7 +259,7 @@ export const deleteTerciaryCategory = async (req, res) => {
         const prevEntry = await db.select().from(terciaryCategoriesTable).where(eq(terciaryCategoriesTable.id, id));
         await cloudinary.uploader.destroy(prevEntry[0].image_public_id);
         await db.delete(terciaryCategoriesTable).where(eq(terciaryCategoriesTable.id, id));
-        return res.status(204);
+        return res.sendStatus(204);
     } catch (error) {
         if(error.cause.detail.includes("models")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated products" });

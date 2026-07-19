@@ -6,7 +6,7 @@ import { brandsTable } from "../db/schema/products.schema.ts";
 const UPLOADER_OPTIONS = {
     resource_type: "image",
     folder: "3D Print Shop/Brands",
-    transformation: [{ fetch_format: "auto", quality: "auto", force_strip: true }]
+    transformation: [{ fetch_format: "auto"}, {quality: "auto"}, {force_strip: true }]
 };
 
 function formatData(data) {
@@ -65,7 +65,7 @@ export const updateBrand = async (req, res) => {
         //Check if there is new logo, if so, delete the previous one and upload the new one
         const prevData = await db.select().from(brandsTable).where(eq(brandsTable.id, id));
         if (logo !== prevData[0].image_url) {
-            await cloudinary.uploader.destroy(prevData[0].public_id);
+            await cloudinary.uploader.destroy(prevData[0].image_public_id);
             const url = await cloudinary.uploader.upload(logo, UPLOADER_OPTIONS);
             updatedBrand.image_url = url.secure_url;
             updatedBrand.image_public_id = url.public_id;
