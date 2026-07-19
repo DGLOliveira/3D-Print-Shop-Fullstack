@@ -1,3 +1,4 @@
+import { toast } from "react-hot-toast";
 
 const handleImageUpload = (setImageUrl: (base64Image: string | ArrayBuffer | null) => void): void => {
     const input = document.createElement("input");
@@ -10,7 +11,14 @@ const handleImageUpload = (setImageUrl: (base64Image: string | ArrayBuffer | nul
             reader.readAsDataURL(target.files[0]);
             reader.onload = async () => {
                 const result = reader.result;
+                const blob = await fetch(result as string).then((r) => r.blob());
+                if(blob.size > 5000000) {
+                    toast.error("Image size must be less than 5MB");
+                    setImageUrl(null);
+                    return
+                }else{
                 setImageUrl(result);
+                }
             };
 
         }
