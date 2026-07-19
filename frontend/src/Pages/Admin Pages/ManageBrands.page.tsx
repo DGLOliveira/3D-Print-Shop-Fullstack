@@ -3,6 +3,7 @@ import { SquarePlus } from 'lucide-react'
 import { useOutletContext, Link } from "react-router"
 import { toast } from "react-hot-toast"
 import { useBrandsStore, type BrandForm } from "../../stores/useBrands.store.tsx"
+import handleImageUpload from "../../utils/handleImageUpload.util.tsx"
 
 export const ManageBrands = () => {
     const [page, setPage] = useState("List")
@@ -45,17 +46,16 @@ export const ManageBrands = () => {
 
     const ListBrands = () => {
 
-
         return (
             <div className="flex flex-col gap-4">
                 <h1 className="text-2xl font-bold text-center my-2">Brands List</h1>
-                <div className="flex flex-row flex-wrap gap-4 m-2 box-border">
+                <div className="flex flex-row flex-wrap gap-4 m-2 box-border justify-center">
                     <div className="card bg-base-200 h-40 w-80 shadow-sm flex flex-col justify-center items-center border border-dashed hover:cursor-pointer hover:*:text-info">
                         <SquarePlus className="size-20 mb-2" onClick={() => setPage("add")} />
                         <span className="text-2xl">Add Brand</span>
                     </div>
                     {brands.map((brand, index) => (
-                        <div key={index} className="card flex-row w-80 h-40 bg-base-100 shadow-sm border border-neutral">
+                        <div key={index} className="card flex-row w-80 h-40 bg-base-100 shadow-sm border hover:border-info box-border p-2">
                             <div className="flex flex-col justify-evenly items-center">
                                 <figure className="w-25 h-25">
                                     <img
@@ -86,24 +86,10 @@ export const ManageBrands = () => {
             logo: null
         });
 
-        const imageUpload = () => {
-            const input = document.createElement("input");
-            input.type = "file";
-            input.accept = "image/*";
-            input.onchange = (event) => {
-                const target = event.target as HTMLInputElement | null;
-                if (target?.files?.[0]) {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(target.files[0]);
-                    reader.onload = async () => {
-                        const base64Image = reader.result;
-                        setBrandForm({ ...brandForm, logo: base64Image })
-                    };
-
-                }
-            }
-            input.click();
+        function changeImage(base64Image: string | ArrayBuffer | null) {
+            setBrandForm({ ...brandForm, logo: base64Image })
         }
+
 
         const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
             e.preventDefault();
@@ -130,7 +116,7 @@ export const ManageBrands = () => {
                 <h1 className="text-2xl font-bold text-center">Add Brand</h1>
                 <div className="flex flex-col gap-2 w-full">
                     <div className="flex justify-center w-full m-1">
-                        <figure className="w-40 h-40 border" onClick={() => imageUpload()}>
+                        <figure className="w-40 h-40 border" onClick={() => handleImageUpload(changeImage)}>
                             {brandForm.logo !== null ?
                                 <img className="w-full h-full object-contain cursor-pointer" src={String(brandForm.logo)} /> :
                                 <div className="skeleton w-full h-full flex flex-col justify-center items-center cursor-pointer">
@@ -200,23 +186,9 @@ export const ManageBrands = () => {
             }
         }, [isDeleting])
 
-        const imageUpload = () => {
-            const input = document.createElement("input");
-            input.type = "file";
-            input.accept = "image/*";
-            input.onchange = (event) => {
-                const target = event.target as HTMLInputElement | null;
-                if (target?.files?.[0]) {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(target.files[0]);
-                    reader.onload = async () => {
-                        const base64Image = reader.result;
-                        setBrandForm({ ...brandForm, logo: base64Image })
-                    };
-
-                }
-            }
-            input.click();
+        
+        function changeImage(base64Image: string | ArrayBuffer | null) {
+            setBrandForm({ ...brandForm, logo: base64Image })
         }
 
         const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -236,7 +208,7 @@ export const ManageBrands = () => {
                     <h1 className="text-2xl font-bold text-center">Add Brand</h1>
                     <div className="flex flex-col gap-2 w-full">
                         <div className="flex justify-center w-full m-1">
-                            <figure className="w-40 h-40 border" onClick={() => imageUpload()}>
+                            <figure className="w-40 h-40 border" onClick={() => handleImageUpload(changeImage)}>
                                 {brandForm.logo !== null ?
                                     <img className="w-full h-full object-contain cursor-pointer" src={String(brandForm.logo)} /> :
                                     <div className="skeleton w-full h-full flex flex-col justify-center items-center cursor-pointer">
