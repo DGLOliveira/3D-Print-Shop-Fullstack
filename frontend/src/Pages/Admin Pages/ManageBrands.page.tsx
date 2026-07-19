@@ -6,8 +6,8 @@ import { useBrandsStore, type BrandForm } from "../../stores/useBrands.store.tsx
 
 export const ManageBrands = () => {
     const [page, setPage] = useState("List")
-        const [prepareExit, setPrepareExit] = useState(false);
-    const [ title, setTitle] = useOutletContext<[title: JSX.Element, setTitle: React.Dispatch<React.SetStateAction<JSX.Element>>]>();
+    const [prepareExit, setPrepareExit] = useState(false);
+    const [_title, setTitle] = useOutletContext<[title: JSX.Element, setTitle: React.Dispatch<React.SetStateAction<JSX.Element>>]>();
     const { brands, selectedBrand, isUpdating, isDeleting, selectBrand, createBrand, updateBrand, deleteBrand } = useBrandsStore()
 
 
@@ -48,27 +48,28 @@ export const ManageBrands = () => {
 
         return (
             <div className="flex flex-col gap-4">
-                <h1 className="text-2xl font-bold">Brands</h1>
-                <div className="flex flex-col gap-2">
-                    <div className="card bg-base-200 h-50 shadow-sm flex flex-col justify-center items-center border-4 border-dashed hover:cursor-pointer hover:*:text-info">
-                        <SquarePlus className="size-32 mb-4" onClick={() => setPage("add")} />
+                <h1 className="text-2xl font-bold text-center my-2">Brands List</h1>
+                <div className="flex flex-row flex-wrap gap-4 m-2 box-border">
+                    <div className="card bg-base-200 h-40 w-80 shadow-sm flex flex-col justify-center items-center border border-dashed hover:cursor-pointer hover:*:text-info">
+                        <SquarePlus className="size-20 mb-2" onClick={() => setPage("add")} />
                         <span className="text-2xl">Add Brand</span>
                     </div>
                     {brands.map((brand, index) => (
-                        <div key={index} className="card flex-row bg-base-100 shadow-sm border border-neutral">
-                            <figure className="w-50 h-50">
-                                <img
-                                    className="w-full h-full object-contain"
-                                    src={brand.image_url ? brand.image_url : "https://stackoverflow.com/does-not-exist.png"}
-                                />
-                            </figure>
+                        <div key={index} className="card flex-row w-80 h-40 bg-base-100 shadow-sm border border-neutral">
+                            <div className="flex flex-col justify-evenly items-center">
+                                <figure className="w-25 h-25">
+                                    <img
+                                        className="w-full h-full object-contain"
+                                        src={brand.image_url ? brand.image_url : "https://stackoverflow.com/does-not-exist.png"}
+                                    />
+                                </figure>
+                                    <div className="card-actions">
+                                        <button className="btn btn-primary w-25" onClick={() => { setPage("edit"); selectBrand(index) }}>Edit</button>
+                                    </div>
+                            </div>
                             <div className="card-body">
                                 <h2 className="card-title">{brand.name}</h2>
                                 <a href={brand.website} target="_blank" className="link link-info">{brand.website}</a>
-                                <p>{brand.summary}</p>
-                                <div className="card-actions">
-                                    <button className="btn btn-primary" onClick={() => { setPage("edit"); selectBrand(index) }}>Edit</button>
-                                </div>
                             </div>
                         </div>
                     ))}
@@ -115,7 +116,7 @@ export const ManageBrands = () => {
             }
         }
 
-        useEffect(() => {   
+        useEffect(() => {
             if (isUpdating) {
                 setPrepareExit(true);
             } else if (prepareExit) {
@@ -277,11 +278,11 @@ export const ManageBrands = () => {
     }
 
 
-    return(
+    return (
         <>
-        {page === "List" && <ListBrands />}
-        {page === "add" && <AddBrand />}
-        {page === "edit" && <EditBrand />}
+            {page === "List" && <ListBrands />}
+            {page === "add" && <AddBrand />}
+            {page === "edit" && <EditBrand />}
         </>
     )
 

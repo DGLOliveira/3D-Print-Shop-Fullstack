@@ -22,9 +22,8 @@ interface BrandsArray extends Array<Brand> { }
 
 
 interface BrandsState {
-    isLoading: boolean;
-    isCreating: boolean;
     isUpdating: boolean;
+    isDeleting: boolean;
     brands: [] | BrandsArray;
     selectedBrand: number | null;
     selectBrand: (index: number | null) => void;
@@ -36,9 +35,8 @@ interface BrandsState {
 
 
 export const useBrandsStore = create<BrandsState>((set, get) => ({
-    isLoading: false,
-    isCreating: false,
     isUpdating: false,
+    isDeleting: false,
     brands: [],
     selectedBrand: null,
 
@@ -48,26 +46,26 @@ export const useBrandsStore = create<BrandsState>((set, get) => ({
 
     fetchBrands: async () => {
         try {
-            set({ isLoading: true });
+            set({ isUpdating: true });
             const res = await axiosInstance.get("/brands");
             set({ brands: res.data.data });
         } catch (error) {
             handleErrorMessage(error, "fetchBrands");
         } finally {
-            set({ isLoading: false });
+            set({ isUpdating: false });
         }
     },
 
     createBrand: async (brandForm) => {
         try {
-            set({ isCreating: true });
+            set({ isUpdating: true });
             const res = await axiosInstance.post("/brands", brandForm);
-            set((state) => ({ brands: [...state.brands, res.data.data[0]] }));
+            set((state) => ({ brands: [...state.brands, res.data.data] }));
             toast.success("Brand created successfully");
         } catch (error) {
             handleErrorMessage(error, "createBrand");
         } finally {
-            set({ isCreating: false });
+            set({ isUpdating: false });
             set({ selectedBrand: get().brands.length - 1});
         }
     },
@@ -76,7 +74,17 @@ export const useBrandsStore = create<BrandsState>((set, get) => ({
         try {
             set({ isUpdating: true });
             const res = await axiosInstance.put("/brands/" + id, brandForm);
-            set((state) => ({ brands: state.brands.map((brand) => brand.id === id ? res.data.data[0] : brand) }));
+            let newBrands = get().brands;
+            if(get().selectedBrand !== null){
+                console.log(get().selectedBrand)
+                newBrands[Number(get().selectedBrand)] = res.data.data;
+            }else{
+                console.log(newBrands)
+                newBrands.map((brand) => brand.id === id ? res.data.data : brand)
+            }
+            console.log(res)
+            console.log(newBrands)
+            set({ brands: newBrands });
             toast.success("Brand updated successfully");
         } catch (error) {
             handleErrorMessage(error, "updateBrand");
@@ -87,14 +95,16 @@ export const useBrandsStore = create<BrandsState>((set, get) => ({
 
     deleteBrand: async (id) => {
         try {
-            set({ isUpdating: true });
+            set({ isDeleting: true });
+            console.log("deleting")
             await axiosInstance.delete("/brands/" + id);
+            console.log("deleted")
             set((state) => ({ brands: state.brands.filter((brand) => brand.id !== id) }));
             toast.success("Brand deleted successfully");
         } catch (error) {
             handleErrorMessage(error, "deleteBrand");
         } finally {
-            set({ isUpdating: false });
+            set({ isDeleting: false });
             set({ selectedBrand: null });
         }
     }
