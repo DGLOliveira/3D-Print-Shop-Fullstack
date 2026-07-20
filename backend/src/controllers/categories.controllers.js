@@ -3,6 +3,12 @@ import cloudinary from "../lib/cloudinary.lib.js";
 import { db } from "../db/index.ts";
 import { primaryCategoriesTable, secondaryCategoriesTable, terciaryCategoriesTable } from "../db/schema/products.schema.ts";
 
+const UPLOADER_OPTIONS = {
+    resource_type: "image",
+    folder: "3D Print Shop/Categories",
+    transformation: [{ fetch_format: "auto" }, { quality: "auto" }, { force_strip: true }]
+};
+
 // Function to format the categories data into a compressed nested structure for frontend use
 function formatCategories(categories) {
     const formattedResult = {};
@@ -11,26 +17,28 @@ function formatCategories(categories) {
             formattedResult[category.primary_categories.id] = {
                 name: category.primary_categories.name,
                 image_url: category.primary_categories.image_url,
-                subcategories: {},
+                subcategories: {}
             }
         }
-        if (category.secondary_categories) {
+        if (category.secondary_categories && !formattedResult[category.primary_categories.id].subcategories[category.secondary_categories.id]) {
             formattedResult[category.primary_categories.id] = {
                 ...formattedResult[category.primary_categories.id],
                 subcategories: {
                     ...formattedResult[category.primary_categories.id].subcategories,
                     [category.secondary_categories.id]: {
                         name: category.secondary_categories.name,
-                        image_url: category.secondary_categories.image_url
+                        image_url: category.secondary_categories.image_url,
+                        subcategories: {}
                     }
                 }
             }
         }
-        if(category.terciary_categories) {
-            formattedResult[category.secondary_categories.id] = {
-                ...formattedResult[category.secondary_categories.id],
+        if (category.terciary_categories) {
+            formattedResult[category.primary_categories.id].subcategories[category.secondary_categories.id] = {
+                name: formattedResult[category.primary_categories.id].subcategories[category.secondary_categories.id].name,
+                image_url: formattedResult[category.primary_categories.id].subcategories[category.secondary_categories.id].image_url,
                 subcategories: {
-                    ...formattedResult[category.secondary_categories.id].subcategories,
+                    ...formattedResult[category.primary_categories.id].subcategories[category.secondary_categories.id].subcategories,
                     [category.terciary_categories.id]: {
                         name: category.terciary_categories.name,
                         image_url: category.terciary_categories.image_url
@@ -45,7 +53,7 @@ function formatCategories(categories) {
 
 export const getAllCategories = async (req, res) => {
     try {
-        const result = await db.select().from(primaryCategoriesTable).leftJoin(secondaryCategoriesTable, eq(primaryCategoriesTable.id, secondaryCategoriesTable.primary_category_id)).leftJoin(terciaryCategoriesTable, eq(secondaryCategoriesTable.id, terciaryCategoriesTable.secondary_category_id));
+        const result = await db.select().from(primaryCategoriesTable).leftJoin(secondaryCategoriesTable, eq(primaryCategoriesTable.id, secondaryCategoriesTable.primary_id)).leftJoin(terciaryCategoriesTable, eq(secondaryCategoriesTable.id, terciaryCategoriesTable.secondary_id));
         console.log(result)
         const formattedCategories = formatCategories(result);
         return res.status(200).json({ success: true, data: formattedCategories });
@@ -63,7 +71,7 @@ export const createPrimaryCategory = async (req, res) => {
     const newCategory = { name, image_url: "", image_public_id: "" };
     try {
         if (image !== "") {
-            const url = await cloudinary.uploader.upload(image);
+            const url = await cloudinary.uploader.upload(image, UPLOADER_OPTIONS);
             newCategory.image_url = url.secure_url;
             newCategory.image_public_id = url.public_id;
         }
@@ -93,11 +101,11 @@ export const updatePrimaryCategory = async (req, res) => {
                 updatedCategory.image_url = "";
                 updatedCategory.image_public_id = "";
             } else {
-                const url = await cloudinary.uploader.upload(image_url);
+                const url = await cloudinary.uploader.upload(image, UPLOADER_OPTIONS);
                 updatedCategory.image_url = url.secure_url;
                 updatedCategory.image_public_id = url.public_id;
             }
-        }else{
+        } else {
             updatedCategory.image_url = prevData[0].image_url;
             updatedCategory.image_public_id = prevData[0].image_public_id;
         }
@@ -119,7 +127,7 @@ export const deletePrimaryCategory = async (req, res) => {
     } catch (error) {
         if (error.cause.detail.includes("secondary_categories")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated subcategories" });
-        }else if(error.cause.detail.includes("models")) {
+        } else if (error.cause.detail.includes("models")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated products" });
         }
         console.error(error);
@@ -135,7 +143,7 @@ export const createSecondaryCategory = async (req, res) => {
     const newCategory = { name, image_url: "", image_public_id: "", primary_id: parent_id };
     try {
         if (image !== "") {
-            const url = await cloudinary.uploader.upload(image);
+            const url = await cloudinary.uploader.upload(image, UPLOADER_OPTIONS);
             newCategory.image_url = url.secure_url;
             newCategory.image_public_id = url.public_id;
         }
@@ -165,11 +173,11 @@ export const updateSecondaryCategory = async (req, res) => {
                 updatedCategory.image_url = "";
                 updatedCategory.image_public_id = "";
             } else {
-                const url = await cloudinary.uploader.upload(image_url);
+                const url = await cloudinary.uploader.upload(image, UPLOADER_OPTIONS);
                 updatedCategory.image_url = url.secure_url;
                 updatedCategory.image_public_id = url.public_id;
             }
-        }else{
+        } else {
             updatedCategory.image_url = prevData[0].image_url;
             updatedCategory.image_public_id = prevData[0].image_public_id;
         }
@@ -191,7 +199,7 @@ export const deleteSecondaryCategory = async (req, res) => {
     } catch (error) {
         if (error.cause.detail.includes("terciary_categories")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated subcategories" });
-        }else if(error.cause.detail.includes("models")) {
+        } else if (error.cause.detail.includes("models")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated products" });
         }
         console.error(error);
@@ -207,7 +215,7 @@ export const createTerciaryCategory = async (req, res) => {
     const newCategory = { name, image_url: "", image_public_id: "", secondary_id: parent_id };
     try {
         if (image !== "") {
-            const url = await cloudinary.uploader.upload(image);
+            const url = await cloudinary.uploader.upload(image, UPLOADER_OPTIONS);
             newCategory.image_url = url.secure_url;
             newCategory.image_public_id = url.public_id;
         }
@@ -237,11 +245,11 @@ export const updateTerciaryCategory = async (req, res) => {
                 updatedCategory.image_url = "";
                 updatedCategory.image_public_id = "";
             } else {
-                const url = await cloudinary.uploader.upload(image_url);
+                const url = await cloudinary.uploader.upload(image, UPLOADER_OPTIONS);
                 updatedCategory.image_url = url.secure_url;
                 updatedCategory.image_public_id = url.public_id;
             }
-        }else{
+        } else {
             updatedCategory.image_url = prevData[0].image_url;
             updatedCategory.image_public_id = prevData[0].image_public_id;
         }
@@ -261,10 +269,10 @@ export const deleteTerciaryCategory = async (req, res) => {
         await db.delete(terciaryCategoriesTable).where(eq(terciaryCategoriesTable.id, id));
         return res.sendStatus(204);
     } catch (error) {
-        if(error.cause.detail.includes("models")) {
+        if (error.cause.detail.includes("models")) {
             return res.status(409).json({ success: false, message: "Cannot delete category with associated products" });
         }
-        console.error(error); 
+        console.error(error);
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }

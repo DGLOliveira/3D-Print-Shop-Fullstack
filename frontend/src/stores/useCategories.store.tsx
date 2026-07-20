@@ -25,7 +25,7 @@ interface SecondaryCategories {
 interface PrimaryCategory {
     name: string;
     image_url: string;
-    subCategories: SecondaryCategories;
+    subcategories: SecondaryCategories;
 }
 
 interface Categories {
@@ -51,16 +51,16 @@ interface CategoriesState {
     selectedTerciaryCategory: number | null;
     categories: Categories;
 
-    setPrimaryCategory: (id: number) => void;
-    setSecondaryCategory: (id: number) => void;
-    setTerciaryCategory: (id: number) => void;
+    setPrimaryCategory: (id: number | null) => void;
+    setSecondaryCategory: (id: number | null) => void;
+    setTerciaryCategory: (id: number | null) => void;
 
     fetchCategories: () => Promise<void>;
 
     createPrimaryCategory: (categoryForm: CategoryForm) => Promise<void>;
     updatePrimaryCategory: (id: number, categoryForm: CategoryForm) => Promise<void>;
     deletePrimaryCategory: (id: number) => Promise<void>;
-    
+
     createSecondaryCategory: (categoryForm: SubCategoryForm) => Promise<void>;
     updateSecondaryCategory: (id: number, categoryForm: SubCategoryForm) => Promise<void>;
     deleteSecondaryCategory: (id: number) => Promise<void>;
@@ -101,7 +101,7 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
         try {
             set({ isUpdating: true });
             const res = await axiosInstance.post(PRIMARY_CATEGORY_URL, categoryForm);
-            set((state) => ({ categories: { ...state.categories, [res.data.data.id]: {name: res.data.data.name, image_url: res.data.data.image_url, subCategories: {} }}}));
+            set((state) => ({ categories: { ...state.categories, [res.data.data.id]: { name: res.data.data.name, image_url: res.data.data.image_url, subcategories: {} } } }));
             toast.success("Primary category created successfully");
         } catch (error) {
             handleErrorMessage(error, "createCategory");
@@ -114,7 +114,7 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
         try {
             set({ isUpdating: true });
             const res = await axiosInstance.put(`${PRIMARY_CATEGORY_URL}/${id}`, categoryForm);
-            set((state) => ({ categories: { ...state.categories, [id]: {name: res.data.data.name, image_url: res.data.data.image_url, subCategories: {...state.categories[id].subCategories} }}}));
+            set((state) => ({ categories: { ...state.categories, [id]: { name: res.data.data.name, image_url: res.data.data.image_url, subcategories: { ...state.categories[id].subcategories } } } }));
             toast.success("Primary category updated successfully");
         } catch (error) {
             handleErrorMessage(error, "updateCategory");
@@ -143,7 +143,7 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
             set({ isUpdating: true });
             const res = await axiosInstance.post(SECONDARY_CATEGORY_URL, subCategoryForm);
             let newCategories = get().categories;
-            newCategories[res.data.data.parent_id].subCategories[res.data.data.id] = {name: res.data.data.name, image_url: res.data.data.image_url, subcategories: {} };
+            newCategories[Number(get().selectedPrimaryCategory)].subcategories[res.data.data.id] = { name: res.data.data.name, image_url: res.data.data.image_url, subcategories: {} };
             set({ categories: newCategories });
             toast.success("Secondary category created successfully");
         } catch (error) {
@@ -158,7 +158,7 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
             set({ isUpdating: true });
             const res = await axiosInstance.put(`${SECONDARY_CATEGORY_URL}/${id}`, subCategoryForm);
             let newCategories = get().categories;
-            newCategories[res.data.data.parent_id].subCategories[id] = {name: res.data.data.name, image_url: res.data.data.image_url, subcategories: {...newCategories[res.data.data.parent_id].subCategories[id].subcategories} };
+            newCategories[Number(get().selectedPrimaryCategory)].subcategories[id] = { name: res.data.data.name, image_url: res.data.data.image_url, subcategories: { ...newCategories[Number(get().selectedPrimaryCategory)].subcategories[id].subcategories } };
             set({ categories: newCategories });
             toast.success("Secondary category updated successfully");
         } catch (error) {
@@ -173,7 +173,7 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
             set({ isDeleting: true });
             await axiosInstance.delete(`${SECONDARY_CATEGORY_URL}/${id}`);
             let newCategories = get().categories;
-            delete newCategories[id];
+            delete newCategories[Number(get().selectedPrimaryCategory)].subcategories[id];
             set({ categories: newCategories });
             toast.success("Secondary category deleted successfully");
         } catch (error) {
@@ -188,13 +188,10 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
             set({ isUpdating: true });
             const res = await axiosInstance.post(TERCIARY_CATEGORY_URL, subCategoryForm);
             let newCategories = get().categories;
-            const selectedPrimaryCategory = get().selectedPrimaryCategory;
-            if (selectedPrimaryCategory !== null) {
-                newCategories[selectedPrimaryCategory].subCategories[res.data.data.parent_id].subcategories[res.data.data.id] = {
-                    name: res.data.data.name,
-                    image_url: res.data.data.image_url,
-                };
-            }
+            newCategories[Number(get().selectedPrimaryCategory)].subcategories[Number(get().selectedSecondaryCategory)].subcategories[res.data.data.id] = {
+                name: res.data.data.name,
+                image_url: res.data.data.image_url,
+            };
             set({ categories: newCategories });
             toast.success("Terciary category created successfully");
         } catch (error) {
@@ -209,10 +206,7 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
             set({ isUpdating: true });
             const res = await axiosInstance.put(`${TERCIARY_CATEGORY_URL}/${id}`, subCategoryForm);
             let newCategories = get().categories;
-            const selectedPrimaryCategory = get().selectedPrimaryCategory;
-            if (selectedPrimaryCategory !== null) {
-                newCategories[selectedPrimaryCategory].subCategories[res.data.data.parent_id].subcategories[id] = {name: res.data.data.name, image_url: res.data.data.image_url};
-            }
+            newCategories[Number(get().selectedPrimaryCategory)].subcategories[Number(get().selectedSecondaryCategory)].subcategories[id] = { name: res.data.data.name, image_url: res.data.data.image_url };
             set({ categories: newCategories });
             toast.success("Terciary category updated successfully");
         } catch (error) {
@@ -227,10 +221,7 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
             set({ isDeleting: true });
             await axiosInstance.delete(`${TERCIARY_CATEGORY_URL}/${id}`);
             let newCategories = get().categories;
-            const selectedPrimaryCategory = get().selectedPrimaryCategory;
-            if (selectedPrimaryCategory !== null) {
-                delete newCategories[selectedPrimaryCategory].subCategories[id];
-            }
+            delete newCategories[Number(get().selectedPrimaryCategory)].subcategories[Number(get().selectedSecondaryCategory)].subcategories[id];
             set({ categories: newCategories });
             toast.success("Terciary category deleted successfully");
         } catch (error) {

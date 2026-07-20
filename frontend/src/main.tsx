@@ -16,6 +16,7 @@ import Login from './Pages/Account Pages/Login.page.tsx'
 //Admin Pages
 import Admin from './Pages/Admin Pages/Admin.page.tsx'
 import ManageBrands from './Pages/Admin Pages/ManageBrands.page.tsx'
+import ManageCategories from './Pages/Admin Pages/ManageCategories.page.tsx'
 
 //Company Pages
 import Company from './Pages/Company Pages/Company.page.tsx'
@@ -86,6 +87,7 @@ createRoot(document.getElementById('root')!).render(
           </Route>
           <Route path="admin" element={<Admin />} >
             <Route path="manage-brands" element={<ManageBrands />} />
+            <Route path="manage-categories" element={<ManageCategories />} />
           </Route>
           <Route path="*" element={<NoPage />} />
         </Route>

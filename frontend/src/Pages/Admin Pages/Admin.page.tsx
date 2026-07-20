@@ -17,7 +17,7 @@ const AdminPage = () => {
     "categories": {
       "title": "Manage Categories",
       "icon": <ListTree className="my-1.5 inline-block size-5" />,
-      "path": "/admin"
+      "path": "/admin/manage-categories"
     },
     "brands": {
       "title": "Manage Brands",
